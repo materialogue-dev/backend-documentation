@@ -256,7 +256,6 @@
       <a href="#fe-custom-products">Custom Products</a>
       <a href="#fe-compare">Compare</a>
       <a href="#fe-wishlist">Wishlist</a>
-      <a href="#fe-moodboard">Moodboard</a>
       <a href="#fe-notifications">Notifications</a>
       <div class="nav-group">Deep Dives</div>
       <a href="#fe-rbac">RBAC System</a>
@@ -1469,17 +1468,19 @@ filters: {
   <h2>How the Frontend Works</h2>
   <p>Every user interaction follows this path through the application layers:</p>
 
-  <div class="flow-diagram">
-    <div class="flow-box"><strong>User Action</strong><span>Click / Navigate</span></div>
-    <div class="flow-arrow">&rarr;</div>
-    <div class="flow-box highlight"><strong>React Router</strong><span>Layout.jsx</span></div>
-    <div class="flow-arrow">&rarr;</div>
-    <div class="flow-box"><strong>Page Component</strong><span>src/pages/</span></div>
-    <div class="flow-arrow">&rarr;</div>
-    <div class="flow-box"><strong>Redux Dispatch</strong><span>Async Thunks</span></div>
-    <div class="flow-arrow">&rarr;</div>
-    <div class="flow-box"><strong>Axios</strong><span>API Calls</span></div>
-    <div class="flow-arrow">&rarr;</div>
+  <div class="flow-diagram" style="flex-direction: column; align-items: center; gap: 0;">
+    <div style="display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 0;">
+      <div class="flow-box"><strong>User Action</strong><span>Click / Navigate</span></div>
+      <div class="flow-arrow">&rarr;</div>
+      <div class="flow-box highlight"><strong>React Router</strong><span>Layout.jsx</span></div>
+      <div class="flow-arrow">&rarr;</div>
+      <div class="flow-box"><strong>Page Component</strong><span>src/pages/</span></div>
+      <div class="flow-arrow">&rarr;</div>
+      <div class="flow-box"><strong>Redux Dispatch</strong><span>Async Thunks</span></div>
+      <div class="flow-arrow">&rarr;</div>
+      <div class="flow-box"><strong>Axios</strong><span>API Calls</span></div>
+    </div>
+    <div class="flow-arrow" style="transform: rotate(90deg); padding: 4px 0;">&rarr;</div>
     <div class="flow-box highlight"><strong>Backend API</strong><span>Express / MongoDB</span></div>
   </div>
 
@@ -1711,7 +1712,6 @@ materialogue-frontend/
 │   │       ├── ordersheet.js          # Export/order sheet creation
 │   │       ├── projectBank.js         # Project bank operations
 │   │       ├── compareSlice.js        # Compare tray (client-side only)
-│   │       ├── moodboard.js           # Moodboard canvas state
 │   │       ├── modal.js               # Address modal state
 │   │       └── appState.js            # Global loading states
 │   │
@@ -2028,7 +2028,7 @@ const ProtectedRoute = ({ children }) => {
 
 <section id="fe-slice-ordersheet">
   <h2>OrderSheet Slice</h2>
-  <p>Handles export document creation and quotation request tracking.</p>
+  <p>Handles export document creation.</p>
   <p>File: <code>src/store/slice/ordersheet.js</code></p>
 
   <h4>Async Thunks</h4>
@@ -2036,7 +2036,6 @@ const ProtectedRoute = ({ children }) => {
     <thead><tr><th>Thunk</th><th>API Endpoint</th><th>Description</th></tr></thead>
     <tbody>
       <tr><td><code>createOrderSheet</code></td><td><code>POST /customer/projects/:projectId/exports</code></td><td>Create a new export</td></tr>
-      <tr><td><code>markOrderSheetSent</code></td><td><code>POST /.../order-sheet/:id/mark-sent</code></td><td>Mark quotation request as sent</td></tr>
     </tbody>
   </table>
 </section>
@@ -2063,10 +2062,6 @@ const ProtectedRoute = ({ children }) => {
     <div class="rel-card">
       <h4>compareSlice.js</h4>
       <p>Client-side only &mdash; no API calls. Manages an array of up to 4 products selected for comparison. Validates that all products share the same category before allowing addition.</p>
-    </div>
-    <div class="rel-card">
-      <h4>moodboard.js</h4>
-      <p>Manages moodboard canvas state: selected products, images, background color, canvas settings, and logo. Uses <code>POST /customer/projects/:projectId/moodboard</code> to save.</p>
     </div>
     <div class="rel-card">
       <h4>modal.js</h4>
@@ -2424,7 +2419,7 @@ navigate("/explore")</pre>
       <li><strong>List View</strong> &mdash; Detailed table with SKU, description, price, brand, and category</li>
       <li><strong>Search</strong> &mdash; Filter products within the export by name</li>
       <li><strong>Direct Downloads</strong> &mdash; Persistent buttons for all three export format downloads</li>
-      <li><strong>Get Quotation</strong> &mdash; Action to initiate procurement for the listed items</li>
+      <li><strong>Get Quotation</strong> &mdash; Planned feature to initiate procurement for the listed items (under discussion, not yet finalized)</li>
     </ul>
   </div>
 </section>
@@ -2541,24 +2536,10 @@ navigate("/explore")</pre>
   </div>
 </section>
 
-<section id="fe-moodboard">
-  <h2>Moodboard</h2>
-  <p>A drag-and-drop visual canvas editor where designers create material presentation boards. Accessed at <code>/mood-board/:mood_board_id?</code>.</p>
-  <p>Files: <code>src/components/MoodboardComponent/</code></p>
-
-  <div class="card">
-    <ul>
-      <li><strong>Canvas</strong> &mdash; The main drawing area where products and images can be placed</li>
-      <li><strong>Draggable Items</strong> &mdash; Products from projects can be dragged onto the canvas and positioned freely using <code>react-dnd</code></li>
-      <li><strong>Image Library</strong> &mdash; Browse and add images from the product catalog</li>
-      <li><strong>Canvas Settings</strong> &mdash; Background color picker (using <code>react-colorful</code>), resizable canvas (<code>re-resizable</code>)</li>
-      <li><strong>Export</strong> &mdash; Save the moodboard to the project via <code>POST /customer/projects/:projectId/moodboard</code>. Can also export as image using <code>html-to-image</code> and <code>jspdf</code>.</li>
-    </ul>
-  </div>
-</section>
 
 <section id="fe-notifications">
   <h2>Notifications</h2>
+  <div class="warn"><strong>Not yet implemented.</strong> The notification feature on the frontend is currently a placeholder tab with dummy data. The sections below describe the planned structure.</div>
   <p>In-app notification system that delivers admin announcements and updates to designers.</p>
 
   <h3>Components</h3>
