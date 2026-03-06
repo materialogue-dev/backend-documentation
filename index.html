@@ -1,206 +1,277 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Materialogue — Backend Documentation</title>
-<style>
-* { margin: 0; padding: 0; box-sizing: border-box; }
-:root {
-  --accent: #c8e64c;
-  --accent-dark: #a8c23a;
-  --sidebar-bg: #1a1d23;
-  --sidebar-text: #b0b4bc;
-  --sidebar-active: #ffffff;
-  --bg: #f8f9fa;
-  --card-bg: #ffffff;
-  --text: #24262b;
-  --text-secondary: #5a5e66;
-  --border: #e2e5ea;
-  --code-bg: #f1f3f5;
-  --method-get: #61affe;
-  --method-post: #49cc90;
-  --method-put: #fca130;
-  --method-delete: #f93e3e;
-  --method-patch: #50e3c2;
-}
-body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: var(--text); background: var(--bg); line-height: 1.6; }
-.layout { display: flex; min-height: 100vh; }
+  <html lang="en">
+  <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Materialogue — Documentation</title>
+  <style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --accent: #c8e64c;
+    --accent-dark: #a8c23a;
+    --sidebar-bg: #1a1d23;
+    --sidebar-text: #b0b4bc;
+    --sidebar-active: #ffffff;
+    --bg: #f8f9fa;
+    --card-bg: #ffffff;
+    --text: #24262b;
+    --text-secondary: #5a5e66;
+    --border: #e2e5ea;
+    --code-bg: #f1f3f5;
+    --method-get: #61affe;
+    --method-post: #49cc90;
+    --method-put: #fca130;
+    --method-delete: #f93e3e;
+    --method-patch: #50e3c2;
+  }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: var(--text); background: var(--bg); line-height: 1.6; }
+  .layout { display: flex; min-height: 100vh; }
 
-.login-overlay { position: fixed; inset: 0; background: var(--sidebar-bg); display: flex; align-items: center; justify-content: center; z-index: 9999; }
-.login-box { background: #22252c; border-radius: 16px; padding: 48px; max-width: 400px; width: 90%; text-align: center; border: 1px solid rgba(255,255,255,0.08); }
-.login-box h1 { color: var(--accent); font-size: 24px; margin-bottom: 6px; }
-.login-box p { color: var(--sidebar-text); font-size: 14px; margin-bottom: 28px; }
-.login-box input { width: 100%; padding: 12px 16px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.12); background: rgba(255,255,255,0.06); color: #fff; font-size: 15px; outline: none; margin-bottom: 12px; }
-.login-box input:focus { border-color: var(--accent); }
-.login-box button { width: 100%; padding: 12px; border-radius: 8px; border: none; background: var(--accent); color: var(--text); font-size: 15px; font-weight: 600; cursor: pointer; }
-.login-box button:hover { background: var(--accent-dark); }
-.login-error { color: #f93e3e; font-size: 13px; margin-top: 8px; display: none; }
+  .login-overlay { position: fixed; inset: 0; background: var(--sidebar-bg); display: flex; align-items: center; justify-content: center; z-index: 9999; }
+  .login-box { background: #22252c; border-radius: 16px; padding: 48px; max-width: 400px; width: 90%; text-align: center; border: 1px solid rgba(255,255,255,0.08); }
+  .login-box h1 { color: var(--accent); font-size: 24px; margin-bottom: 6px; }
+  .login-box p { color: var(--sidebar-text); font-size: 14px; margin-bottom: 28px; }
+  .login-box input { width: 100%; padding: 12px 16px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.12); background: rgba(255,255,255,0.06); color: #fff; font-size: 15px; outline: none; margin-bottom: 12px; }
+  .login-box input:focus { border-color: var(--accent); }
+  .login-box button { width: 100%; padding: 12px; border-radius: 8px; border: none; background: var(--accent); color: var(--text); font-size: 15px; font-weight: 600; cursor: pointer; }
+  .login-box button:hover { background: var(--accent-dark); }
+  .login-error { color: #f93e3e; font-size: 13px; margin-top: 8px; display: none; }
 
-.sidebar { width: 280px; background: var(--sidebar-bg); color: var(--sidebar-text); position: fixed; top: 0; left: 0; bottom: 0; overflow-y: auto; z-index: 100; transition: transform 0.3s; }
-.sidebar-header { padding: 24px 20px; border-bottom: 1px solid rgba(255,255,255,0.08); }
-.sidebar-header h1 { color: var(--accent); font-size: 20px; font-weight: 700; letter-spacing: -0.5px; }
-.sidebar-header p { color: var(--sidebar-text); font-size: 12px; margin-top: 4px; }
-.sidebar nav { padding: 12px 0; }
-.sidebar nav a { display: block; padding: 8px 20px; color: var(--sidebar-text); text-decoration: none; font-size: 13px; transition: all 0.2s; border-left: 3px solid transparent; }
-.sidebar nav a:hover { color: var(--sidebar-active); background: rgba(255,255,255,0.04); }
-.sidebar nav a.active { color: var(--accent); border-left-color: var(--accent); background: rgba(200,230,76,0.06); }
-.sidebar nav .nav-group { padding: 16px 20px 6px; font-size: 10px; text-transform: uppercase; letter-spacing: 1.2px; color: rgba(255,255,255,0.3); font-weight: 600; }
-.sidebar .swagger-link { display: block; margin: 16px 20px; padding: 10px; text-align: center; background: var(--accent); color: var(--text); font-size: 13px; font-weight: 600; text-decoration: none; border-radius: 6px; }
-.sidebar .swagger-link:hover { background: var(--accent-dark); }
-.content { margin-left: 280px; flex: 1; padding: 40px 48px; max-width: 1000px; }
-.menu-toggle { display: none; position: fixed; top: 12px; left: 12px; z-index: 200; background: var(--sidebar-bg); color: var(--accent); border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 20px; }
-section { margin-bottom: 48px; scroll-margin-top: 20px; }
-h2 { font-size: 28px; font-weight: 700; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 2px solid var(--accent); color: var(--text); }
-h3 { font-size: 20px; font-weight: 600; margin: 24px 0 12px; color: var(--text); }
-h4 { font-size: 16px; font-weight: 600; margin: 16px 0 8px; color: var(--text); }
-p { margin-bottom: 12px; color: var(--text-secondary); }
-ul, ol { margin: 0 0 16px 24px; color: var(--text-secondary); }
-li { margin-bottom: 4px; }
-.card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 10px; padding: 24px; margin-bottom: 20px; }
-.badge { display: inline-block; padding: 3px 10px; border-radius: 4px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #fff; font-family: monospace; }
-.badge-get { background: var(--method-get); }
-.badge-post { background: var(--method-post); }
-.badge-put { background: var(--method-put); }
-.badge-delete { background: var(--method-delete); }
-.badge-patch { background: var(--method-patch); }
-.badge-auth { background: #6c5ce7; }
-code { background: var(--code-bg); padding: 2px 6px; border-radius: 4px; font-size: 13px; font-family: 'SF Mono', Monaco, monospace; }
-pre { background: var(--sidebar-bg); color: #e6e8eb; padding: 16px 20px; border-radius: 8px; overflow-x: auto; margin: 12px 0 20px; font-size: 13px; line-height: 1.5; }
-table { width: 100%; border-collapse: collapse; margin: 12px 0 20px; font-size: 14px; }
-th { background: var(--sidebar-bg); color: #fff; padding: 10px 14px; text-align: left; font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
-th:first-child { border-radius: 6px 0 0 0; } th:last-child { border-radius: 0 6px 0 0; }
-td { padding: 10px 14px; border-bottom: 1px solid var(--border); }
-tr:hover td { background: rgba(200,230,76,0.04); }
-.ep { background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; margin-bottom: 12px; overflow: hidden; }
-.ep-header { display: flex; align-items: center; gap: 12px; padding: 12px 16px; }
-.ep-header .path { font-family: 'SF Mono', Monaco, monospace; font-size: 14px; font-weight: 500; }
-.ep-header .desc { color: var(--text-secondary); font-size: 13px; margin-left: auto; }
-.tech-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin: 16px 0; }
-.tech-item { background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; padding: 16px; text-align: center; }
-.tech-item strong { display: block; color: var(--text); margin-bottom: 4px; }
-.tech-item span { font-size: 13px; color: var(--text-secondary); }
-.note { background: #fffdf0; border: 1px solid #f0e6b0; border-left: 4px solid #e6c84c; border-radius: 6px; padding: 12px 16px; margin: 12px 0; font-size: 14px; color: var(--text-secondary); }
-.warn { background: #fff5f5; border: 1px solid #ffc9c9; border-left: 4px solid var(--method-delete); border-radius: 6px; padding: 12px 16px; margin: 12px 0; font-size: 14px; color: var(--text-secondary); }
+  .sidebar { width: 280px; background: var(--sidebar-bg); color: var(--sidebar-text); position: fixed; top: 0; left: 0; bottom: 0; overflow-y: auto; z-index: 100; transition: transform 0.3s; }
+  .sidebar-header { padding: 24px 20px; border-bottom: 1px solid rgba(255,255,255,0.08); }
+  .sidebar-header h1 { color: var(--accent); font-size: 20px; font-weight: 700; letter-spacing: -0.5px; }
+  .sidebar-header p { color: var(--sidebar-text); font-size: 12px; margin-top: 4px; }
+  .sidebar nav { padding: 12px 0; }
+  .sidebar nav a { display: block; padding: 8px 20px; color: var(--sidebar-text); text-decoration: none; font-size: 13px; transition: all 0.2s; border-left: 3px solid transparent; }
+  .sidebar nav a:hover { color: var(--sidebar-active); background: rgba(255,255,255,0.04); }
+  .sidebar nav a.active { color: var(--accent); border-left-color: var(--accent); background: rgba(200,230,76,0.06); }
+  .sidebar nav .nav-group { padding: 16px 20px 6px; font-size: 10px; text-transform: uppercase; letter-spacing: 1.2px; color: rgba(255,255,255,0.3); font-weight: 600; }
+  .sidebar .swagger-link { display: block; margin: 16px 20px; padding: 10px; text-align: center; background: var(--accent); color: var(--text); font-size: 13px; font-weight: 600; text-decoration: none; border-radius: 6px; }
+  .sidebar .swagger-link:hover { background: var(--accent-dark); }
+  .content { margin-left: 280px; flex: 1; padding: 40px 48px; max-width: 1000px; }
+  .menu-toggle { display: none; position: fixed; top: 12px; left: 12px; z-index: 200; background: var(--sidebar-bg); color: var(--accent); border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 20px; }
+  section { margin-bottom: 48px; scroll-margin-top: 20px; }
+  h2 { font-size: 28px; font-weight: 700; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 2px solid var(--accent); color: var(--text); }
+  h3 { font-size: 20px; font-weight: 600; margin: 24px 0 12px; color: var(--text); }
+  h4 { font-size: 16px; font-weight: 600; margin: 16px 0 8px; color: var(--text); }
+  p { margin-bottom: 12px; color: var(--text-secondary); }
+  ul, ol { margin: 0 0 16px 24px; color: var(--text-secondary); }
+  li { margin-bottom: 4px; }
+  .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 10px; padding: 24px; margin-bottom: 20px; }
+  .badge { display: inline-block; padding: 3px 10px; border-radius: 4px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #fff; font-family: monospace; }
+  .badge-get { background: var(--method-get); }
+  .badge-post { background: var(--method-post); }
+  .badge-put { background: var(--method-put); }
+  .badge-delete { background: var(--method-delete); }
+  .badge-patch { background: var(--method-patch); }
+  .badge-auth { background: #6c5ce7; }
+  .badge-page { background: #6c5ce7; }
+  .badge-component { background: #00b894; }
+  .badge-redux { background: #e17055; }
+  .badge-hook { background: #fdcb6e; color: #2d3436; }
+  .badge-protected { background: var(--method-delete); }
+  .badge-public { background: var(--method-post); }
+  code { background: var(--code-bg); padding: 2px 6px; border-radius: 4px; font-size: 13px; font-family: 'SF Mono', Monaco, monospace; }
+  pre { background: var(--sidebar-bg); color: #e6e8eb; padding: 16px 20px; border-radius: 8px; overflow-x: auto; margin: 12px 0 20px; font-size: 13px; line-height: 1.5; }
+  table { width: 100%; border-collapse: collapse; margin: 12px 0 20px; font-size: 14px; }
+  th { background: var(--sidebar-bg); color: #fff; padding: 10px 14px; text-align: left; font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+  th:first-child { border-radius: 6px 0 0 0; } th:last-child { border-radius: 0 6px 0 0; }
+  td { padding: 10px 14px; border-bottom: 1px solid var(--border); }
+  tr:hover td { background: rgba(200,230,76,0.04); }
+  .ep { background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; margin-bottom: 12px; overflow: hidden; }
+  .ep-header { display: flex; align-items: center; gap: 12px; padding: 12px 16px; }
+  .ep-header .path { font-family: 'SF Mono', Monaco, monospace; font-size: 14px; font-weight: 500; }
+  .ep-header .desc { color: var(--text-secondary); font-size: 13px; margin-left: auto; }
+  .tech-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin: 16px 0; }
+  .tech-item { background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; padding: 16px; text-align: center; }
+  .tech-item strong { display: block; color: var(--text); margin-bottom: 4px; }
+  .tech-item span { font-size: 13px; color: var(--text-secondary); }
+  .note { background: #fffdf0; border: 1px solid #f0e6b0; border-left: 4px solid #e6c84c; border-radius: 6px; padding: 12px 16px; margin: 12px 0; font-size: 14px; color: var(--text-secondary); }
+  .warn { background: #fff5f5; border: 1px solid #ffc9c9; border-left: 4px solid var(--method-delete); border-radius: 6px; padding: 12px 16px; margin: 12px 0; font-size: 14px; color: var(--text-secondary); }
 
-.flow-diagram { display: flex; align-items: center; justify-content: center; gap: 0; flex-wrap: wrap; margin: 24px 0; padding: 24px 0; }
-.flow-box { background: var(--card-bg); border: 2px solid var(--border); border-radius: 10px; padding: 14px 20px; text-align: center; min-width: 120px; }
-.flow-box strong { display: block; font-size: 14px; color: var(--text); }
-.flow-box span { font-size: 11px; color: var(--text-secondary); }
-.flow-box.highlight { border-color: var(--accent); background: rgba(200,230,76,0.08); }
-.flow-arrow { font-size: 22px; color: var(--accent-dark); padding: 0 6px; font-weight: bold; flex-shrink: 0; }
+  .flow-diagram { display: flex; align-items: center; justify-content: center; gap: 0; flex-wrap: wrap; margin: 24px 0; padding: 24px 0; }
+  .flow-box { background: var(--card-bg); border: 2px solid var(--border); border-radius: 10px; padding: 14px 20px; text-align: center; min-width: 120px; }
+  .flow-box strong { display: block; font-size: 14px; color: var(--text); }
+  .flow-box span { font-size: 11px; color: var(--text-secondary); }
+  .flow-box.highlight { border-color: var(--accent); background: rgba(200,230,76,0.08); }
+  .flow-arrow { font-size: 22px; color: var(--accent-dark); padding: 0 6px; font-weight: bold; flex-shrink: 0; }
 
-.rel-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 20px 0; }
-.rel-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 10px; padding: 18px; }
-.rel-card h4 { margin: 0 0 8px; font-size: 15px; color: var(--text); }
-.rel-card p { margin: 0; font-size: 13px; color: var(--text-secondary); line-height: 1.5; }
-.rel-card .rel-arrow { color: var(--accent-dark); font-weight: 600; }
+  .rel-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 20px 0; }
+  .rel-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 10px; padding: 18px; }
+  .rel-card h4 { margin: 0 0 8px; font-size: 15px; color: var(--text); }
+  .rel-card p { margin: 0; font-size: 13px; color: var(--text-secondary); line-height: 1.5; }
+  .rel-card .rel-arrow { color: var(--accent-dark); font-weight: 600; }
 
-.journey-step { display: flex; align-items: flex-start; gap: 16px; margin-bottom: 20px; }
-.journey-num { width: 36px; height: 36px; background: var(--accent); color: var(--text); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 15px; flex-shrink: 0; }
-.journey-content { flex: 1; }
-.journey-content strong { display: block; margin-bottom: 2px; color: var(--text); }
-.journey-content p { margin: 0; font-size: 14px; color: var(--text-secondary); }
-.journey-connector { width: 2px; height: 16px; background: var(--accent); margin: -12px 0 -12px 17px; }
+  .journey-step { display: flex; align-items: flex-start; gap: 16px; margin-bottom: 20px; }
+  .journey-num { width: 36px; height: 36px; background: var(--accent); color: var(--text); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 15px; flex-shrink: 0; }
+  .journey-content { flex: 1; }
+  .journey-content strong { display: block; margin-bottom: 2px; color: var(--text); }
+  .journey-content p { margin: 0; font-size: 14px; color: var(--text-secondary); }
+  .journey-connector { width: 2px; height: 16px; background: var(--accent); margin: -12px 0 -12px 17px; }
 
-.env-table td:first-child { font-family: 'SF Mono', Monaco, monospace; font-size: 13px; white-space: nowrap; }
+  .env-table td:first-child { font-family: 'SF Mono', Monaco, monospace; font-size: 13px; white-space: nowrap; }
+  .route-table td:first-child { font-family: 'SF Mono', Monaco, monospace; font-size: 13px; white-space: nowrap; }
 
-@media (max-width: 768px) {
-  .sidebar { transform: translateX(-100%); }
-  .sidebar.open { transform: translateX(0); }
-  .content { margin-left: 0; padding: 20px 16px; padding-top: 60px; }
-  .menu-toggle { display: block; }
-  table { font-size: 12px; }
-  th, td { padding: 6px 8px; }
-  .flow-diagram { flex-direction: column; }
-  .flow-arrow { transform: rotate(90deg); }
-  .rel-grid { grid-template-columns: 1fr; }
-}
-</style>
-</head>
-<body>
+  .tab-bar { display: flex; gap: 0; margin: 0 20px; border-bottom: 1px solid rgba(255,255,255,0.08); }
+  .tab-btn { flex: 1; padding: 12px 16px; text-align: center; font-size: 13px; font-weight: 600; color: var(--sidebar-text); background: transparent; border: none; cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.2s; }
+  .tab-btn:hover { color: var(--sidebar-active); background: rgba(255,255,255,0.04); }
+  .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); background: rgba(200,230,76,0.06); }
 
-<div class="login-overlay" id="loginOverlay">
-  <div class="login-box">
-    <h1>Materialogue</h1>
-    <p>Backend Documentation — Password Required</p>
-    <input type="password" id="loginPassword" placeholder="Enter password" autocomplete="off">
-    <button onclick="attemptLogin()">Access Documentation</button>
-    <div class="login-error" id="loginError">Incorrect password. Please try again.</div>
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  @media (max-width: 768px) {
+    .sidebar { transform: translateX(-100%); }
+    .sidebar.open { transform: translateX(0); }
+    .content { margin-left: 0; padding: 20px 16px; padding-top: 60px; }
+    .menu-toggle { display: block; }
+    table { font-size: 12px; }
+    th, td { padding: 6px 8px; }
+    .flow-diagram { flex-direction: column; }
+    .flow-arrow { transform: rotate(90deg); }
+    .rel-grid { grid-template-columns: 1fr; }
+  }
+  </style>
+  </head>
+  <body>
+
+  <div class="login-overlay" id="loginOverlay">
+    <div class="login-box">
+      <h1>Materialogue</h1>
+      <p>Documentation &mdash; Password Required</p>
+      <input type="password" id="loginPassword" placeholder="Enter password" autocomplete="off">
+      <button onclick="attemptLogin()">Access Documentation</button>
+      <div class="login-error" id="loginError">Incorrect password. Please try again.</div>
+    </div>
   </div>
-</div>
 
-<button class="menu-toggle" onclick="document.querySelector('.sidebar').classList.toggle('open')">&#9776;</button>
-<div class="layout" id="mainLayout" style="display:none;">
-<aside class="sidebar">
-  <div class="sidebar-header">
-    <h1>Materialogue</h1>
-    <p>Backend Documentation</p>
-  </div>
-  <nav>
-    <div class="nav-group">Getting Started</div>
-    <a href="#overview">What is Materialogue?</a>
-    <a href="#how-it-works">How the System Works</a>
-    <a href="#user-journey">User Journey</a>
-    <a href="#tech-stack">Tech Stack</a>
-    <a href="#project-structure">Project Structure</a>
-    <a href="#env-vars">Environment Variables</a>
-    <div class="nav-group">Data Models</div>
-    <a href="#model-relationships">How Models Connect</a>
-    <a href="#model-user">User</a>
-    <a href="#model-company">Company</a>
-    <a href="#model-product">Product</a>
-    <a href="#model-project">Project</a>
-    <a href="#model-brand">Brand</a>
-    <a href="#model-category">Category</a>
-    <a href="#model-custom-product">CustomProduct</a>
-    <a href="#model-temp-user">TempUser</a>
-    <a href="#model-otp">OTP</a>
-    <a href="#model-brand-contact">BrandContact</a>
-    <a href="#model-brand-api-key">BrandApiKey</a>
-    <a href="#model-notification">Notification</a>
-    <a href="#model-receipt">NotificationReceipt</a>
-    <div class="nav-group">Authentication</div>
-    <a href="#ep-auth">Auth Endpoints</a>
-    <div class="nav-group">Customer / Designer</div>
-    <a href="#ep-profile">Profile</a>
-    <a href="#ep-wishlist">Wishlist</a>
-    <a href="#ep-projects">Projects</a>
-    <a href="#ep-spaces">Spaces</a>
-    <a href="#ep-space-products">Space Products</a>
-    <a href="#ep-project-bank">Project Bank</a>
-    <a href="#ep-exports">Exports</a>
-    <a href="#ep-export-templates">Export Templates</a>
-    <a href="#ep-customer-notifs">Designer Notifications</a>
-    <div class="nav-group">Products</div>
-    <a href="#ep-products">Product Endpoints</a>
-    <a href="#ep-custom-products">Custom Products</a>
-    <a href="#ep-categories">Categories</a>
-    <div class="nav-group">Admin</div>
-    <a href="#ep-admin-users">Users</a>
-    <a href="#ep-admin-products">Products</a>
-    <a href="#ep-admin-brands">Brands</a>
-    <a href="#ep-admin-uploads">Uploads</a>
-    <a href="#ep-admin-notifs">Notifications</a>
-    <div class="nav-group">Company</div>
-    <a href="#ep-company">Members</a>
-    <div class="nav-group">Brand System</div>
-    <a href="#ep-brands-public">Brand Pages</a>
-    <a href="#ep-brand-api">Brand Partner API</a>
-    <div class="nav-group">Deep Dives</div>
-    <a href="#cross-filtering">Cross-Filtering</a>
-    <a href="#export-system">Export System</a>
-    <a href="#notification-system">Notification System</a>
-    <a href="#pdf-proxy">PDF Proxy</a>
-  </nav>
-  <a class="swagger-link" href="https://brand-guidelines.materialogue.com/" target="_blank">Brand Partner Swagger Docs &rarr;</a>
-</aside>
+  <button class="menu-toggle" onclick="document.querySelector('.sidebar').classList.toggle('open')">&#9776;</button>
+  <div class="layout" id="mainLayout" style="display:none;">
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <h1>Materialogue</h1>
+      <p>Documentation</p>
+    </div>
+    <div class="tab-bar">
+      <button class="tab-btn active" onclick="switchTab('backend')">Backend</button>
+      <button class="tab-btn" onclick="switchTab('frontend')">Frontend</button>
+    </div>
 
-<main class="content">
+    <nav id="nav-backend">
+      <div class="nav-group">Getting Started</div>
+      <a href="#be-overview">What is Materialogue?</a>
+      <a href="#be-how-it-works">How the System Works</a>
+      <a href="#be-user-journey">User Journey</a>
+      <a href="#be-tech-stack">Tech Stack</a>
+      <a href="#be-project-structure">Project Structure</a>
+      <a href="#be-env-vars">Environment Variables</a>
+      <div class="nav-group">Data Models</div>
+      <a href="#be-model-relationships">How Models Connect</a>
+      <a href="#be-model-user">User</a>
+      <a href="#be-model-company">Company</a>
+      <a href="#be-model-product">Product</a>
+      <a href="#be-model-project">Project</a>
+      <a href="#be-model-brand">Brand</a>
+      <a href="#be-model-category">Category</a>
+      <a href="#be-model-custom-product">CustomProduct</a>
+      <a href="#be-model-temp-user">TempUser</a>
+      <a href="#be-model-otp">OTP</a>
+      <a href="#be-model-brand-contact">BrandContact</a>
+      <a href="#be-model-brand-api-key">BrandApiKey</a>
+      <a href="#be-model-notification">Notification</a>
+      <a href="#be-model-receipt">NotificationReceipt</a>
+      <div class="nav-group">Authentication</div>
+      <a href="#be-ep-auth">Auth Endpoints</a>
+      <div class="nav-group">Customer / Designer</div>
+      <a href="#be-ep-profile">Profile</a>
+      <a href="#be-ep-wishlist">Wishlist</a>
+      <a href="#be-ep-projects">Projects</a>
+      <a href="#be-ep-spaces">Spaces</a>
+      <a href="#be-ep-space-products">Space Products</a>
+      <a href="#be-ep-project-bank">Project Bank</a>
+      <a href="#be-ep-exports">Exports</a>
+      <a href="#be-ep-export-templates">Export Templates</a>
+      <a href="#be-ep-customer-notifs">Designer Notifications</a>
+      <div class="nav-group">Products</div>
+      <a href="#be-ep-products">Product Endpoints</a>
+      <a href="#be-ep-custom-products">Custom Products</a>
+      <a href="#be-ep-categories">Categories</a>
+      <div class="nav-group">Admin</div>
+      <a href="#be-ep-admin-users">Users</a>
+      <a href="#be-ep-admin-products">Products</a>
+      <a href="#be-ep-admin-brands">Brands</a>
+      <a href="#be-ep-admin-uploads">Uploads</a>
+      <a href="#be-ep-admin-notifs">Notifications</a>
+      <div class="nav-group">Company</div>
+      <a href="#be-ep-company">Members</a>
+      <div class="nav-group">Brand System</div>
+      <a href="#be-ep-brands-public">Brand Pages</a>
+      <a href="#be-ep-brand-api">Brand Partner API</a>
+      <div class="nav-group">Deep Dives</div>
+      <a href="#be-cross-filtering">Cross-Filtering</a>
+      <a href="#be-export-system">Export System</a>
+      <a href="#be-notification-system">Notification System</a>
+      <a href="#be-pdf-proxy">PDF Proxy</a>
+    </nav>
+    <div id="swagger-link-backend">
+      <a class="swagger-link" href="https://brand-guidelines.materialogue.com/" target="_blank">Brand Partner Swagger Docs &rarr;</a>
+    </div>
 
+    <nav id="nav-frontend" style="display:none;">
+      <div class="nav-group">Getting Started</div>
+      <a href="#fe-overview">What is the Frontend?</a>
+      <a href="#fe-how-it-works">How the Frontend Works</a>
+      <a href="#fe-user-journey">User Journey</a>
+      <a href="#fe-tech-stack">Tech Stack</a>
+      <a href="#fe-project-structure">Project Structure</a>
+      <a href="#fe-configuration">Configuration</a>
+      <div class="nav-group">Routing &amp; Layout</div>
+      <a href="#fe-routing">Route Map</a>
+      <a href="#fe-layout-system">Layout System</a>
+      <a href="#fe-protected-routes">Protected Routes</a>
+      <div class="nav-group">State Management</div>
+      <a href="#fe-redux-overview">Redux Overview</a>
+      <a href="#fe-slice-user">User Slice</a>
+      <a href="#fe-slice-signup">Signup Slice</a>
+      <a href="#fe-slice-productNav">ProductNav Slice</a>
+      <a href="#fe-slice-wishlist">Wishlist Slice</a>
+      <a href="#fe-slice-customProduct">CustomProduct Slice</a>
+      <a href="#fe-slice-companyMembers">CompanyMembers Slice</a>
+      <a href="#fe-slice-ordersheet">OrderSheet Slice</a>
+      <a href="#fe-slice-projectBank">ProjectBank Slice</a>
+      <a href="#fe-slice-others">Other Slices</a>
+      <div class="nav-group">Authentication</div>
+      <a href="#fe-auth-signup">Signup Flow</a>
+      <a href="#fe-auth-login">Login Flow</a>
+      <a href="#fe-auth-password-reset">Password Reset</a>
+      <a href="#fe-auth-interceptors">Axios Interceptors</a>
+      <div class="nav-group">Pages &amp; Features</div>
+      <a href="#fe-landing-page">Landing Page</a>
+      <a href="#fe-dashboard">Dashboard / Explore</a>
+      <a href="#fe-product-catalog">Product Catalog</a>
+      <a href="#fe-filtering">Filtering System</a>
+      <a href="#fe-projects">Projects</a>
+      <a href="#fe-exports">Exports</a>
+      <a href="#fe-profile">Profile</a>
+      <a href="#fe-custom-products">Custom Products</a>
+      <a href="#fe-compare">Compare</a>
+      <a href="#fe-wishlist">Wishlist</a>
+      <a href="#fe-moodboard">Moodboard</a>
+      <a href="#fe-notifications">Notifications</a>
+      <div class="nav-group">Deep Dives</div>
+      <a href="#fe-rbac">RBAC System</a>
+      <a href="#fe-styling">Styling Architecture</a>
+      <a href="#fe-reusable-components">Reusable Components</a>
+    </nav>
+  </aside>
+
+  <main class="content">
+
+  <div id="content-backend" class="tab-content active">
+  
 <!-- ==================== GETTING STARTED ==================== -->
 
-<section id="overview">
+<section id="be-overview">
   <h2>What is Materialogue?</h2>
   <p>Materialogue is a product catalog and project management platform built for architects and interior designers in India. It lets designers browse curated catalogs of building materials (tiles, sanitary ware, paints, fabrics, lights, and more), organize those materials into projects, and generate professional export documents to share with clients and vendors.</p>
   <p>This backend API powers all of that — from user authentication, to the product catalog with smart filtering, to PDF and Excel generation for client-ready documents.</p>
@@ -219,7 +290,7 @@ tr:hover td { background: rgba(200,230,76,0.04); }
   </div>
 </section>
 
-<section id="how-it-works">
+<section id="be-how-it-works">
   <h2>How the System Works</h2>
   <p>Every request to the backend follows this path — from the frontend app to the database and back:</p>
 
@@ -254,7 +325,7 @@ tr:hover td { background: rgba(200,230,76,0.04); }
   <p>For brand partners, authentication is simpler — they include their API key in the <code>X-API-Key</code> header, and the middleware looks up which brand the key belongs to.</p>
 </section>
 
-<section id="user-journey">
+<section id="be-user-journey">
   <h2>User Journey</h2>
   <p>Here's how a typical designer uses the platform, and which parts of the backend power each step:</p>
 
@@ -322,7 +393,7 @@ tr:hover td { background: rgba(200,230,76,0.04); }
   </div>
 </section>
 
-<section id="tech-stack">
+<section id="be-tech-stack">
   <h2>Tech Stack</h2>
   <div class="tech-grid">
     <div class="tech-item"><strong>Node.js 20</strong><span>Runtime</span></div>
@@ -337,7 +408,7 @@ tr:hover td { background: rgba(200,230,76,0.04); }
   <p>The server runs on port <code>5000</code> bound to <code>0.0.0.0</code>. CORS is fully open (<code>*</code>) via manual middleware in app.js — no cors package is used. MongoDB is hosted externally on DigitalOcean Managed Databases.</p>
 </section>
 
-<section id="project-structure">
+<section id="be-project-structure">
   <h2>Project Structure</h2>
   <p>The codebase follows a straightforward MVC-like pattern. Each domain (auth, products, projects, etc.) has its own route file, controller, and model.</p>
   <pre>
@@ -409,7 +480,7 @@ materialogue-backend/
 └── guidelines.html                # Brand partner guide page</pre>
 </section>
 
-<section id="env-vars">
+<section id="be-env-vars">
   <h2>Environment Variables</h2>
   <p>The backend uses these environment variables. Some have defaults, others must be set for the app to work correctly.</p>
   <table class="env-table">
@@ -429,7 +500,7 @@ materialogue-backend/
 
 <!-- ==================== DATA MODELS ==================== -->
 
-<section id="model-relationships">
+<section id="be-model-relationships">
   <h2>How Models Connect</h2>
   <p>The data model is centered around Users, Projects, and Products. Here's how everything relates:</p>
 
@@ -469,7 +540,7 @@ materialogue-backend/
   </div>
 </section>
 
-<section id="model-user">
+<section id="be-model-user">
   <h2>User Model</h2>
   <p>The User model represents every person who uses the platform — both designers (who browse and create projects) and admins (who manage the product catalog). When a user signs up, they're created with <code>is_approved: false</code> and must be approved by an admin before getting full access.</p>
   <p>File: <code>models/User.js</code></p>
@@ -496,7 +567,7 @@ materialogue-backend/
   <div class="note"><strong>Approval flow:</strong> New users get a 5-minute JWT until approved. Once an admin approves them via <code>PATCH /admin/users/:id/approve</code>, they receive full-duration tokens.</div>
 </section>
 
-<section id="model-company">
+<section id="be-model-company">
   <h2>Company Model</h2>
   <p>A Company is essentially a workspace that groups users together. Every user gets one automatically when they sign up — even individual designers. For firms, the Company lets multiple team members collaborate on the same projects.</p>
   <p>File: <code>models/Company.js</code></p>
@@ -510,7 +581,7 @@ materialogue-backend/
   <div class="note"><strong>No members array:</strong> Members are queried via <code>User.find({ company: companyId })</code> — the Company model itself doesn't store a list of members.</div>
 </section>
 
-<section id="model-product">
+<section id="be-model-product">
   <h2>Product Model</h2>
   <p>The Product model is the most complex schema in the system, with 100+ fields covering every type of building material — from tiles and marble to sanitary ware, paints, fabrics, and lights. Most fields are optional since different product categories use different attributes (a tile has "size" and "finish", while a faucet has "cock_type" and "water_saving").</p>
   <p>File: <code>models/Product.js</code></p>
@@ -538,7 +609,7 @@ materialogue-backend/
   <div class="note"><strong>Variant grouping:</strong> Products with the same <code>primary_sku</code> are treated as variants of one product. When a user views a product, the API returns its siblings (other variants) so the user can switch between colors/sizes.</div>
 </section>
 
-<section id="model-project">
+<section id="be-model-project">
   <h2>Project Model</h2>
   <p>A Project is the central organizing unit for designers. It represents a real-world site (a home, office, or commercial space) and contains everything related to that project — the spaces, the product selections, and the generated exports.</p>
   <p>File: <code>models/Project.js</code></p>
@@ -569,7 +640,7 @@ materialogue-backend/
   </div>
 </section>
 
-<section id="model-brand">
+<section id="be-model-brand">
   <h2>Brand Model</h2>
   <p>The Brand model stores everything about a building material brand — its profile, collections, dealer network, and contact info. Brands are displayed on public brand pages where users can explore a brand's products and submit contact/enquiry forms.</p>
   <p>File: <code>models/Brand.js</code></p>
@@ -588,7 +659,7 @@ materialogue-backend/
   </table>
 </section>
 
-<section id="model-category">
+<section id="be-model-category">
   <h2>Category Model</h2>
   <p>Categories define the taxonomy used to organize the product catalog. The system uses a three-level hierarchy that matches how building materials are naturally classified.</p>
   <p>File: <code>models/Category.js</code></p>
@@ -602,7 +673,7 @@ materialogue-backend/
   <p>Each level has a <code>hasProducts</code> boolean flag indicating whether actual products exist at that level.</p>
 </section>
 
-<section id="model-custom-product">
+<section id="be-model-custom-product">
   <h2>CustomProduct Model</h2>
   <p>When a designer sources a material that isn't in the Materialogue catalog — perhaps from a local vendor or a specialty manufacturer — they can create a Custom Product. These work just like catalog products in projects and exports, but they're only visible to the user who created them.</p>
   <p>File: <code>models/CustomProduct.js</code></p>
@@ -623,7 +694,7 @@ materialogue-backend/
   <div class="note">Uses the same attribute fields as Product (color, finish, material, size, thickness, etc.) so custom products appear consistently in exports.</div>
 </section>
 
-<section id="model-temp-user">
+<section id="be-model-temp-user">
   <h2>TempUser Model</h2>
   <p>A temporary holding record created during signup, before the user verifies their email. Once OTP verification succeeds, the TempUser data is moved to the permanent User collection and the TempUser record is deleted.</p>
   <p>File: <code>models/TempUser.js</code></p>
@@ -641,7 +712,7 @@ materialogue-backend/
   </table>
 </section>
 
-<section id="model-otp">
+<section id="be-model-otp">
   <h2>OTP Model</h2>
   <p>Stores one-time passwords for email verification during signup and password reset. Each OTP auto-expires after 5 minutes thanks to a MongoDB TTL index on <code>createdAt</code>.</p>
   <p>File: <code>models/Otp.js</code></p>
@@ -656,7 +727,7 @@ materialogue-backend/
   </table>
 </section>
 
-<section id="model-brand-contact">
+<section id="be-model-brand-contact">
   <h2>BrandContact Model</h2>
   <p>When a user submits a contact/enquiry form on a brand's public page, the submission is saved as a BrandContact document. This lets brands track incoming interest from designers.</p>
   <p>File: <code>models/BrandContact.js</code></p>
@@ -672,7 +743,7 @@ materialogue-backend/
   </table>
 </section>
 
-<section id="model-brand-api-key">
+<section id="be-model-brand-api-key">
   <h2>BrandApiKey Model</h2>
   <p>Stores API keys for brand partners. Each key is tied to a specific brand and can be activated or deactivated. When a brand partner makes an API call, the middleware looks up the key and automatically scopes all operations to that brand.</p>
   <p>File: <code>models/BrandApiKey.js</code></p>
@@ -687,7 +758,7 @@ materialogue-backend/
   </table>
 </section>
 
-<section id="model-notification">
+<section id="be-model-notification">
   <h2>Notification Model</h2>
   <p>Notifications are created by admins and delivered to designers via in-app messages and/or email. Each notification targets specific Indian states, so admins can send region-specific announcements — like a new showroom opening in Maharashtra, or a sale event in Karnataka.</p>
   <p>File: <code>models/Notification.js</code></p>
@@ -709,7 +780,7 @@ materialogue-backend/
   </table>
 </section>
 
-<section id="model-receipt">
+<section id="be-model-receipt">
   <h2>NotificationReceipt Model</h2>
   <p>One receipt is created per user per notification when a notification is sent. Receipts track the full lifecycle of a notification for each recipient — was it delivered? Did they read it? Did they click the link? This data powers the analytics dashboard for admins.</p>
   <p>File: <code>models/NotificationReceipt.js</code></p>
@@ -731,7 +802,7 @@ materialogue-backend/
 
 <!-- ==================== ENDPOINTS ==================== -->
 
-<section id="ep-auth">
+<section id="be-ep-auth">
   <h2>Authentication Endpoints</h2>
   <p>These endpoints handle user registration, login, and password management. No JWT token is required — these are the entry points to the system.</p>
   <p>Base path: <code>/auth</code></p>
@@ -804,7 +875,7 @@ POST /auth/login
   <div class="note"><strong>Token duration:</strong> Approved users get long-lived tokens. Unapproved users get tokens that expire in 5 minutes — just enough to complete their profile setup.</div>
 </section>
 
-<section id="ep-profile">
+<section id="be-ep-profile">
   <h2>Customer Profile</h2>
   <p>Endpoints for designers to manage their own account — update personal info, change password, upload professional documents (architecture registration, design degrees), and delete their account.</p>
   <p>Base path: <code>/customer</code> — All endpoints require <span class="badge badge-auth">JWT</span></p>
@@ -820,7 +891,7 @@ POST /auth/login
   <div class="ep"><div class="ep-header"><span class="badge badge-post">POST</span><span class="path">/customer/upload/photo</span><span class="desc">Upload profile photo</span></div></div>
 </section>
 
-<section id="ep-wishlist">
+<section id="be-ep-wishlist">
   <h2>Wishlist</h2>
   <p>A simple favorites list. Designers can save products they like for later — the wishlist is stored directly on the User document as an array of product IDs.</p>
   <p>Base path: <code>/customer/wishlist</code> — Requires <span class="badge badge-auth">JWT</span></p>
@@ -829,7 +900,7 @@ POST /auth/login
   <div class="ep"><div class="ep-header"><span class="badge badge-post">POST</span><span class="path">/customer/wishlist/remove/:productId</span><span class="desc">Remove product from wishlist</span></div></div>
 </section>
 
-<section id="ep-projects">
+<section id="be-ep-projects">
   <h2>Projects</h2>
   <p>Projects are the main workspace for designers. Each project represents a real-world site and contains spaces, products, and exports. Projects belong to a user and can be shared within a company.</p>
   <p>Base path: <code>/customer/projects</code> — Requires <span class="badge badge-auth">JWT</span></p>
@@ -859,7 +930,7 @@ POST /auth/login
 }</pre>
 </section>
 
-<section id="ep-spaces">
+<section id="be-ep-spaces">
   <h2>Spaces</h2>
   <p>Spaces represent physical areas within a project — like rooms, zones, or floors. Designers organize their product selections by space so they can easily see what goes where.</p>
   <p>Base path: <code>/customer/projects/:projectId/spaces</code> — Requires <span class="badge badge-auth">JWT</span></p>
@@ -873,7 +944,7 @@ POST /auth/login
 }</pre>
 </section>
 
-<section id="ep-space-products">
+<section id="be-ep-space-products">
   <h2>Space Products</h2>
   <p>Products inside a space. When a designer finds a tile they want for the bathroom, they add it to the "Bathroom" space with a quantity. These are embedded subdocuments — they reference the catalog product by ID and store space-specific details like quantity.</p>
   <p>Base path: <code>/customer/projects/:projectId/spaces/:spaceId/products</code> — Requires <span class="badge badge-auth">JWT</span></p>
@@ -882,7 +953,7 @@ POST /auth/login
   <div class="ep"><div class="ep-header"><span class="badge badge-delete">DELETE</span><span class="path">/.../products/:productId</span><span class="desc">Remove product from space</span></div></div>
 </section>
 
-<section id="ep-project-bank">
+<section id="be-ep-project-bank">
   <h2>Project Bank</h2>
   <p>A holding area for products the designer is considering for a project but hasn't assigned to a specific space yet. Think of it as a "project-level wishlist" — products can be moved from the bank into a space when the designer decides where they go.</p>
   <p>Requires <span class="badge badge-auth">JWT</span></p>
@@ -890,7 +961,7 @@ POST /auth/login
   <div class="ep"><div class="ep-header"><span class="badge badge-delete">DELETE</span><span class="path">/customer/projects/:projectId/project-bank/:productId</span><span class="desc">Remove from bank</span></div></div>
 </section>
 
-<section id="ep-exports">
+<section id="be-ep-exports">
   <h2>Exports CRUD</h2>
   <p>Exports are saved configurations that define which products to include in generated documents. Each export stores the section name, product references, and URLs for the generated files (PDF Order Sheet, PDF Selection Sheet, Excel).</p>
   <p>Requires <span class="badge badge-auth">JWT</span></p>
@@ -901,7 +972,7 @@ POST /auth/login
   <div class="ep"><div class="ep-header"><span class="badge badge-delete">DELETE</span><span class="path">/customer/projects/:projectId/exports/:exportId</span><span class="desc">Delete export</span></div></div>
 </section>
 
-<section id="ep-export-templates">
+<section id="be-ep-export-templates">
   <h2>Export Templates (HTML / PDF / Excel)</h2>
   <p>These endpoints generate the actual documents — the professional-looking sheets that designers share with clients and vendors. No authentication is required because export URLs are meant to be shareable.</p>
   <div class="ep"><div class="ep-header"><span class="badge badge-get">GET</span><span class="path">/.../exports/:exportId/order-sheet</span><span class="desc">Order Sheet HTML (for browser viewing)</span></div></div>
@@ -910,10 +981,10 @@ POST /auth/login
   <div class="ep"><div class="ep-header"><span class="badge badge-get">GET</span><span class="path">/.../exports/:exportId/selection-sheet/pdf</span><span class="desc">Selection Sheet PDF download</span></div></div>
   <div class="ep"><div class="ep-header"><span class="badge badge-get">GET</span><span class="path">/.../exports/:exportId/excel</span><span class="desc">Excel spreadsheet download</span></div></div>
   <div class="note"><strong>Theme colors:</strong> Append <code>?color=HEX</code> (without #) to customize the export appearance. Example: <code>?color=592ebd</code> for purple, <code>?color=1abc9c</code> for teal. Default is beige (#e7e3db).</div>
-  <div class="note"><strong>PDF generation:</strong> Uses Puppeteer to render the HTML template and convert it to PDF. If Chrome isn't available on the server, the request is automatically proxied to a deployment that has it (see <a href="#pdf-proxy">PDF Proxy</a>).</div>
+  <div class="note"><strong>PDF generation:</strong> Uses Puppeteer to render the HTML template and convert it to PDF. If Chrome isn't available on the server, the request is automatically proxied to a deployment that has it (see <a href="#be-pdf-proxy">PDF Proxy</a>).</div>
 </section>
 
-<section id="ep-customer-notifs">
+<section id="be-ep-customer-notifs">
   <h2>Designer Notifications</h2>
   <p>The designer-facing side of the notification system. These endpoints let the frontend show notifications to users, track whether they've been read, and count unread notifications for badge display.</p>
   <p>Base path: <code>/customer/notifications</code></p>
@@ -955,7 +1026,7 @@ POST /auth/login
 }</pre>
 </section>
 
-<section id="ep-products">
+<section id="be-ep-products">
   <h2>Product Endpoints</h2>
   <p>The product catalog is the heart of the platform. These endpoints handle browsing, searching, and filtering the full product database. The search endpoint with cross-filtering is the most heavily used — it powers the main catalog browsing experience.</p>
   <p>Base path: <code>/products</code></p>
@@ -1009,10 +1080,10 @@ POST /auth/login
   "min_price": 8500,
   "max_price": 125000
 }</pre>
-  <p>The <code>filters</code> object shows only values that exist in the current filtered set. If selecting "Kohler" as brand means no "Blue" products exist, "Blue" won't appear in the color filter. See <a href="#cross-filtering">Cross-Filtering</a> for details.</p>
+  <p>The <code>filters</code> object shows only values that exist in the current filtered set. If selecting "Kohler" as brand means no "Blue" products exist, "Blue" won't appear in the color filter. See <a href="#be-cross-filtering">Cross-Filtering</a> for details.</p>
 </section>
 
-<section id="ep-custom-products">
+<section id="be-ep-custom-products">
   <h2>Custom Products</h2>
   <p>For products not in the Materialogue catalog. Designers can create their own product entries with images, specs, and vendor details. Custom products work just like catalog products in projects and exports.</p>
   <p>Base path: <code>/customProducts</code> — Most require <span class="badge badge-auth">JWT</span></p>
@@ -1024,13 +1095,13 @@ POST /auth/login
   <div class="ep"><div class="ep-header"><span class="badge badge-post">POST</span><span class="path">/customProducts/upload</span><span class="desc">Upload file for custom product</span></div></div>
 </section>
 
-<section id="ep-categories">
+<section id="be-ep-categories">
   <h2>Categories</h2>
   <p>Returns the full category tree — all categories, subcategories, and sub-subcategories with their <code>hasProducts</code> flags. Used by the frontend to build the category navigation.</p>
   <div class="ep"><div class="ep-header"><span class="badge badge-get">GET</span><span class="path">/category</span><span class="desc">Get full category tree (3 levels deep)</span></div></div>
 </section>
 
-<section id="ep-admin-users">
+<section id="be-ep-admin-users">
   <h2>Admin — Users</h2>
   <p>Admin endpoints for managing user accounts. Admins can view all users, update their details, approve/reject signups, and permanently delete accounts.</p>
   <p>Base path: <code>/admin</code></p>
@@ -1040,7 +1111,7 @@ POST /auth/login
   <div class="ep"><div class="ep-header"><span class="badge badge-patch">PATCH</span><span class="path">/admin/users/:id/approve</span><span class="desc">Toggle user approval status</span></div></div>
 </section>
 
-<section id="ep-admin-products">
+<section id="be-ep-admin-products">
   <h2>Admin — Products</h2>
   <p>Admin endpoints for managing the product catalog. Products can be created individually, bulk uploaded via JSON or CSV, and archived (soft-deleted) when discontinued.</p>
   <div class="ep"><div class="ep-header"><span class="badge badge-post">POST</span><span class="path">/admin/products</span><span class="desc">Create product (auto-populates brandId from brand name)</span></div></div>
@@ -1051,7 +1122,7 @@ POST /auth/login
   <div class="ep"><div class="ep-header"><span class="badge badge-get">GET</span><span class="path">/admin/products/bulkCSV</span><span class="desc">Bulk upload from CSV URL</span></div></div>
 </section>
 
-<section id="ep-admin-brands">
+<section id="be-ep-admin-brands">
   <h2>Admin — Brands</h2>
   <p>Manage brand profiles and their API keys. The "seed" endpoint is particularly useful — it scans all products and auto-creates Brand records for any brand name that doesn't have one yet.</p>
   <div class="ep"><div class="ep-header"><span class="badge badge-post">POST</span><span class="path">/admin/brands/seed</span><span class="desc">Auto-create brands from product data</span></div></div>
@@ -1063,7 +1134,7 @@ POST /auth/login
   <div class="ep"><div class="ep-header"><span class="badge badge-post">POST</span><span class="path">/admin/brands/:id/regenerate-key</span><span class="desc">Regenerate brand API key</span></div></div>
 </section>
 
-<section id="ep-admin-uploads">
+<section id="be-ep-admin-uploads">
   <h2>Admin — Uploads &amp; Images</h2>
   <p>File upload and bulk image processing utilities. Files are stored on DigitalOcean Spaces (S3-compatible) and the returned URL is used in product records.</p>
   <div class="ep"><div class="ep-header"><span class="badge badge-post">POST</span><span class="path">/admin/upload</span><span class="desc">Upload file (Base64 &rarr; DigitalOcean Spaces, returns URL)</span></div></div>
@@ -1072,7 +1143,7 @@ POST /auth/login
   <div class="ep"><div class="ep-header"><span class="badge badge-get">GET</span><span class="path">/admin/images/folder-csv</span><span class="desc">Export image folder listing to CSV</span></div></div>
 </section>
 
-<section id="ep-admin-notifs">
+<section id="be-ep-admin-notifs">
   <h2>Admin — Notifications</h2>
   <p>The admin side of the notification system. Admins create notifications as drafts, preview the audience, send them out, and track engagement through real-time analytics. Notifications can target specific Indian states and be delivered via in-app messages and/or email.</p>
   <p>Base path: <code>/admin/notifications</code></p>
@@ -1125,7 +1196,7 @@ POST /auth/login
 }</pre>
 </section>
 
-<section id="ep-company">
+<section id="be-ep-company">
   <h2>Company — Members</h2>
   <p>Team management for design firms. The company admin can add team members (who get a "Company Member" account with their own login), manage their roles, and reset their passwords. Adding a member automatically sends them a welcome email with their credentials.</p>
   <p>Base path: <code>/company</code> — Requires <span class="badge badge-auth">JWT</span></p>
@@ -1136,7 +1207,7 @@ POST /auth/login
   <div class="ep"><div class="ep-header"><span class="badge badge-post">POST</span><span class="path">/company/members/reset-password</span><span class="desc">Reset member's password</span></div></div>
 </section>
 
-<section id="ep-brands-public">
+<section id="be-ep-brands-public">
   <h2>Brand Pages (Public)</h2>
   <p>Public-facing brand endpoints — no authentication needed. These power the brand information pages on the frontend, where users can view a brand's profile, collections, and dealer network, and submit contact/enquiry forms.</p>
   <p>Base path: <code>/brands</code></p>
@@ -1152,7 +1223,7 @@ POST /auth/login
 }</pre>
 </section>
 
-<section id="ep-brand-api">
+<section id="be-ep-brand-api">
   <h2>Brand Partner API</h2>
   <p>Brand partners like Kohler, Jaquar, and Simpolo can manage their own product data through this API. Every request requires an <code>X-API-Key</code> header, and all operations are automatically scoped to the brand that owns the key — a brand can only see and modify their own data.</p>
   <p>Base path: <code>/brand-api</code> — Requires <code>X-API-Key</code> header</p>
@@ -1176,7 +1247,7 @@ Headers:
 
 <!-- ==================== DEEP DIVES ==================== -->
 
-<section id="cross-filtering">
+<section id="be-cross-filtering">
   <h2>Cross-Filtering System</h2>
   <p>The <code>POST /products/withFilters</code> endpoint uses a cross-filtering approach that keeps filter options relevant and useful. Instead of showing every possible value for every filter, it dynamically narrows options based on what's currently selected.</p>
 
@@ -1231,7 +1302,7 @@ filters: {
   <div class="note"><strong>Performance:</strong> Product normalization (lowercase, trimmed) is pre-computed once per request. Search results are cached and reused across all filter computations to avoid redundant work.</div>
 </section>
 
-<section id="export-system">
+<section id="be-export-system">
   <h2>Export System</h2>
   <p>The export system generates professional-grade documents that designers share with clients for material approval and with vendors for procurement. There are three types of exports, each serving a different purpose.</p>
 
@@ -1270,7 +1341,7 @@ filters: {
   <div class="note">If a mapped attribute is empty for a specific product, the system falls back to the generic logic and picks the next available non-empty attribute.</div>
 </section>
 
-<section id="notification-system">
+<section id="be-notification-system">
   <h2>Notification System Architecture</h2>
   <p>The notification system lets admins communicate with designers across the platform. It supports targeted delivery (by state), dual channels (in-app + email), and provides detailed engagement analytics.</p>
 
@@ -1336,7 +1407,7 @@ filters: {
   </ul>
 </section>
 
-<section id="pdf-proxy">
+<section id="be-pdf-proxy">
   <h2>PDF Proxy Fallback</h2>
   <p>PDF generation uses Puppeteer (headless Chrome) to render HTML templates and convert them to PDF files. This works great on servers with Chrome installed, but some deployment environments don't have the necessary system libraries.</p>
   <p>The solution: a transparent proxy fallback that lets the same codebase work everywhere.</p>
@@ -1370,46 +1441,1355 @@ filters: {
   <div class="note"><strong>Configuration:</strong> Set the <code>PDF_PROXY_URL</code> environment variable to point to a deployment with Chrome installed. The Replit deployment always has Chrome available.</div>
 </section>
 
-</main>
-</div>
 
-<script>
-function _h(s){let h=0;for(let i=0;i<s.length;i++){h=((h<<5)-h)+s.charCodeAt(i);h|=0;}return h;}
-function attemptLogin() {
-  const input = document.getElementById('loginPassword').value;
-  if (_h(input) === 445234471) {
+  </div>
+
+  <div id="content-frontend" class="tab-content">
+  <section id="fe-overview">
+  <h2>What is the Materialogue Frontend?</h2>
+  <p>The Materialogue frontend is a React single-page application (SPA) that powers the user-facing side of the platform. It lets architects and interior designers browse a curated catalog of building materials, organize selections into projects with spaces, generate professional export documents, manage teams, and collaborate &mdash; all from the browser.</p>
+  <p>This frontend connects to the Materialogue backend API for all data operations, authentication, and file management.</p>
+  <div class="card">
+    <h4>What this frontend does</h4>
+    <ul>
+      <li><strong>Product Discovery</strong> &mdash; Browse 8+ material categories with smart cross-filtering, search, and category navigation</li>
+      <li><strong>Project Management</strong> &mdash; Create projects, organize products into spaces (rooms), and track quantities</li>
+      <li><strong>Export Generation</strong> &mdash; Generate and download Order Sheets (PDF), Selection Sheets (PDF), and Excel spreadsheets</li>
+      <li><strong>Authentication</strong> &mdash; Email-based signup with OTP, JWT session management, and password reset flows</li>
+      <li><strong>Team Collaboration</strong> &mdash; Company workspaces with member management, role-based access control</li>
+      <li><strong>Compare &amp; Wishlist</strong> &mdash; Side-by-side product comparison (up to 4) and personal favorites list</li>
+      <li><strong>Custom Products</strong> &mdash; Designers can add their own products with vendor details when items aren't in the catalog</li>
+      <li><strong>Moodboard</strong> &mdash; Drag-and-drop canvas editor for visual material presentations</li>
+      <li><strong>Notifications</strong> &mdash; In-app notification system with unread badges and click tracking</li>
+    </ul>
+  </div>
+</section>
+
+<section id="fe-how-it-works">
+  <h2>How the Frontend Works</h2>
+  <p>Every user interaction follows this path through the application layers:</p>
+
+  <div class="flow-diagram">
+    <div class="flow-box"><strong>User Action</strong><span>Click / Navigate</span></div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-box highlight"><strong>React Router</strong><span>Layout.jsx</span></div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-box"><strong>Page Component</strong><span>src/pages/</span></div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-box"><strong>Redux Dispatch</strong><span>Async Thunks</span></div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-box"><strong>Axios</strong><span>API Calls</span></div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-box highlight"><strong>Backend API</strong><span>Express / MongoDB</span></div>
+  </div>
+
+  <div class="card">
+    <h4>Layer by layer</h4>
+    <ul>
+      <li><strong>Layout.jsx</strong> &mdash; The root component. Defines all routes using React Router's <code>useRoutes</code>, wraps pages with the appropriate navbar and footer combination, and handles initial data loading (user profile, navigation categories).</li>
+      <li><strong>Pages</strong> &mdash; Full-page components in <code>src/pages/</code>. Each page handles one feature area (Dashboard, Projects, Profile, etc.) and composes smaller components.</li>
+      <li><strong>Components</strong> &mdash; Reusable UI pieces in <code>src/components/</code>. Includes the Navbar, ProductNavigation, Filter system, ProductCard, Footer, and many more.</li>
+      <li><strong>Redux Store</strong> &mdash; Centralized state management via Redux Toolkit. Each domain has its own "slice" (user, products, projects, wishlist, etc.) with async thunks that handle API communication.</li>
+      <li><strong>Axios</strong> &mdash; HTTP client with interceptors that automatically attach JWT tokens to requests and handle 401 (session expired) responses globally.</li>
+      <li><strong>Styling</strong> &mdash; A hybrid approach using Tailwind CSS utility classes alongside SCSS modules. Global variables (colors, fonts, breakpoints) are defined in SCSS and Tailwind config.</li>
+    </ul>
+  </div>
+</section>
+
+<section id="fe-user-journey">
+  <h2>User Journey</h2>
+  <p>Here's how a typical designer uses the platform, and which frontend pages and components power each step:</p>
+
+  <div class="journey-step">
+    <div class="journey-num">1</div>
+    <div class="journey-content">
+      <strong>Land on the Marketing Page</strong>
+      <p>The designer arrives at the landing page (<code>/</code>) which showcases the platform through interactive sections: material galleries, "How It Works" walkthrough, brand partnerships, reviews from other designers, and a demo request form.</p>
+      <p>Component: <code>LandingPage.jsx</code></p>
+    </div>
+  </div>
+  <div class="journey-connector"></div>
+  <div class="journey-step">
+    <div class="journey-num">2</div>
+    <div class="journey-content">
+      <strong>Sign Up &amp; Verify</strong>
+      <p>The designer clicks "Start for Free" and chooses between Individual or Company account. They fill in their details (name, email, phone, password with strength validation), receive a 6-digit OTP via email, verify it, and optionally upload professional credentials.</p>
+      <p>Pages: <code>SelectionType</code> &rarr; <code>IndividualDetail / CompanyDetail</code> &rarr; <code>VerifyOtp</code> &rarr; <code>Registration</code></p>
+    </div>
+  </div>
+  <div class="journey-connector"></div>
+  <div class="journey-step">
+    <div class="journey-num">3</div>
+    <div class="journey-content">
+      <strong>Explore the Catalog</strong>
+      <p>After login, the designer lands on the Dashboard (<code>/explore</code>). They browse the product catalog using the category navigation bar (Walls &amp; Floor, Sanitary, Paints, Surfaces, Fabrics, Lights, Electricals, Hardware) and narrow results with filters for brand, color, finish, size, price range, and more.</p>
+      <p>Components: <code>Dashboard</code>, <code>ProductNavigation</code>, <code>FilterMenu</code>, <code>ProductCard</code></p>
+    </div>
+  </div>
+  <div class="journey-connector"></div>
+  <div class="journey-step">
+    <div class="journey-num">4</div>
+    <div class="journey-content">
+      <strong>View Product Details</strong>
+      <p>Clicking a product card opens the full detail page with image gallery, hover-to-zoom, variant switching, specifications, and downloadable resources (spec sheets, HD textures). The designer can add the product to their wishlist or directly to a project space.</p>
+      <p>Page: <code>ProductByID</code></p>
+    </div>
+  </div>
+  <div class="journey-connector"></div>
+  <div class="journey-step">
+    <div class="journey-num">5</div>
+    <div class="journey-content">
+      <strong>Create a Project &amp; Organize into Spaces</strong>
+      <p>The designer creates a project (e.g., "Sharma Residence") with client details and adds spaces like "Master Bedroom", "Kitchen", "Bathroom 1". Products from the catalog are assigned to specific spaces with quantities.</p>
+      <p>Page: <code>Projects</code> with <code>AddProject</code>, <code>AddSpace</code> modals</p>
+    </div>
+  </div>
+  <div class="journey-connector"></div>
+  <div class="journey-step">
+    <div class="journey-num">6</div>
+    <div class="journey-content">
+      <strong>Compare &amp; Decide</strong>
+      <p>While browsing, the designer can add up to 4 products from the same category to a comparison tray. The compare page generates a dynamic table showing every specification side by side to help with material selection decisions.</p>
+      <p>Components: <code>CompareBtn</code>, <code>CompareTray</code>, <code>ComparePage</code></p>
+    </div>
+  </div>
+  <div class="journey-connector"></div>
+  <div class="journey-step">
+    <div class="journey-num">7</div>
+    <div class="journey-content">
+      <strong>Generate &amp; Download Exports</strong>
+      <p>When ready to share with clients or vendors, the designer generates professional export documents from the exports page: Selection Sheets (visual product cards for client approval), Order Sheets (tabular format for procurement), and Excel spreadsheets (detailed bill of materials). Each can be viewed online or downloaded.</p>
+      <p>Pages: <code>ExportsPage</code>, <code>ExportDetailView</code></p>
+    </div>
+  </div>
+</section>
+
+<section id="fe-tech-stack">
+  <h2>Tech Stack</h2>
+  <div class="tech-grid">
+    <div class="tech-item"><strong>React 18</strong><span>UI Framework</span></div>
+    <div class="tech-item"><strong>Vite 5</strong><span>Build Tool &amp; Dev Server</span></div>
+    <div class="tech-item"><strong>Redux Toolkit</strong><span>State Management</span></div>
+    <div class="tech-item"><strong>React Router 6</strong><span>Client-side Routing</span></div>
+    <div class="tech-item"><strong>Tailwind CSS 3</strong><span>Utility-first Styling</span></div>
+    <div class="tech-item"><strong>SASS</strong><span>Component Stylesheets</span></div>
+    <div class="tech-item"><strong>Axios</strong><span>HTTP Client</span></div>
+    <div class="tech-item"><strong>Framer Motion</strong><span>Animations</span></div>
+    <div class="tech-item"><strong>Radix UI</strong><span>Accessible Primitives</span></div>
+    <div class="tech-item"><strong>Lucide React</strong><span>Icon Library</span></div>
+    <div class="tech-item"><strong>React Slick</strong><span>Image Carousels</span></div>
+    <div class="tech-item"><strong>Sonner</strong><span>Toast Notifications</span></div>
+  </div>
+  <p>The dev server runs on port <code>5173</code> via Vite, bound to <code>0.0.0.0</code> for Replit proxy compatibility. All hosts are allowed. The build produces a static <code>dist/</code> folder. SVGs are imported as React components via <code>vite-plugin-svgr</code>.</p>
+</section>
+
+<section id="fe-project-structure">
+  <h2>Project Structure</h2>
+  <p>The codebase follows a feature-based organization. Pages represent full views, components are reusable pieces, and the Redux store is organized by domain.</p>
+  <pre>
+materialogue-frontend/
+├── index.html                         # Entry HTML (mounts React)
+├── vite.config.js                     # Vite build config + SVGR plugin
+├── tailwind.config.js                 # Tailwind CSS configuration
+├── package.json                       # Dependencies &amp; scripts
+│
+├── src/
+│   ├── main.jsx                       # React entry point (renders App)
+│   ├── App.jsx                        # Wraps Layout in Redux Provider + Router
+│   ├── Layout.jsx                     # All route definitions + ProtectedRoute
+│   │
+│   ├── pages/                         # Full-page components (one folder per feature)
+│   │   ├── CreateAccount/             # Signup &amp; Login flows
+│   │   │   ├── Signup/                # SelectionType, IndividualDetail, CompanyDetail,
+│   │   │   │                          #   VerifyOtp, Registration, GetBack
+│   │   │   ├── Login/                 # LoginSection, PasswordSection, ForgetPassword,
+│   │   │   │                          #   ResetPassword, LoginVerifyOtp
+│   │   │   ├── LeftSection.jsx        # Branded left panel for auth pages
+│   │   │   └── RegisStructure.jsx     # Layout wrapper for registration steps
+│   │   │
+│   │   ├── Dashboard/                 # Main explore/browse page
+│   │   │   └── Dashboard.jsx
+│   │   │
+│   │   ├── Product/                   # Product detail view
+│   │   │   ├── ProductByID.jsx        # Image gallery, specs, variants, add-to-project
+│   │   │   └── AddToProjectModal.jsx  # Modal to assign product to a project space
+│   │   │
+│   │   ├── Projects/                  # Project management
+│   │   │   ├── Projects.jsx           # Project list (card/list views) + space management
+│   │   │   ├── AddProject.jsx         # Create/edit project modal
+│   │   │   ├── AddSpace.jsx           # Create space modal
+│   │   │   ├── EditProject.jsx        # Edit project details
+│   │   │   ├── EditProductInSpace.jsx # Edit product within a space
+│   │   │   ├── Exports.jsx            # Export list item component
+│   │   │   ├── ExportsPage.jsx        # Export management page (table + FAQ sidebar)
+│   │   │   └── ExportDetailView.jsx   # View export contents (card/list toggle)
+│   │   │
+│   │   ├── Profile/                   # User profile &amp; settings
+│   │   │   ├── Profile.jsx            # Tab navigation wrapper
+│   │   │   ├── Details.jsx            # Personal/company info, document uploads
+│   │   │   ├── TeamMembers.jsx        # Team management (add/edit/delete members)
+│   │   │   ├── Project.jsx            # Project settings (currently disabled)
+│   │   │   └── AddressModal.jsx       # Address editing modal
+│   │   │
+│   │   ├── CustomProducts/            # User-created products
+│   │   │   ├── CustomProducts.jsx     # List all custom products
+│   │   │   ├── AddProduct.jsx         # Create/edit custom product form
+│   │   │   ├── CustomProductById.jsx  # Single custom product detail
+│   │   │   ├── ProductCard.jsx        # Custom product card component
+│   │   │   └── SpaceSelector.jsx      # Space selection for custom products
+│   │   │
+│   │   ├── Compare/                   # Side-by-side product comparison
+│   │   │   └── ComparePage.jsx
+│   │   │
+│   │   ├── Wishlist/                  # Personal favorites
+│   │   │   └── Wishlist.jsx
+│   │   │
+│   │   ├── MoodBoard/                 # Visual canvas editor
+│   │   │   └── MoodBoard.jsx
+│   │   │
+│   │   ├── Notification/              # Notification listing page
+│   │   │   └── Notification.jsx
+│   │   │
+│   │   ├── ProjectBank/               # Project-level product holding area
+│   │   │   └── ProjectBank.jsx
+│   │   │
+│   │   ├── BrandInfo/                 # Public brand profile pages
+│   │   │   └── BrandInfo.jsx
+│   │   │
+│   │   ├── Blogs/                     # Industry insight articles
+│   │   │   └── BlogPost.jsx
+│   │   │
+│   │   ├── About/                     # About Us page
+│   │   ├── FAQs/                      # FAQ page
+│   │   ├── JoinUs/                    # Why Join Us page
+│   │   ├── Terms/                     # Terms of Use
+│   │   ├── PrivacyPolicy/             # Privacy Policy
+│   │   ├── CookiePolicy/              # Cookie Policy
+│   │   ├── Tutorial/                  # Tutorial walkthroughs
+│   │   └── SignUp/                    # Signup entry page
+│   │
+│   ├── components/                    # Reusable UI components
+│   │   ├── Navbar/                    # Main app navbar (Navbar.jsx, LoginNav.jsx)
+│   │   ├── Landing/                   # Landing page sections
+│   │   │   ├── Navbar/                # Marketing navbar
+│   │   │   ├── Home/                  # Hero section with image slider
+│   │   │   ├── HowItWorks/            # Interactive feature walkthrough
+│   │   │   ├── Categories/            # Category grid with hover sub-menus
+│   │   │   ├── Brands/                # Brand logo marquee
+│   │   │   ├── Reviews/               # Designer testimonials
+│   │   │   ├── Question/              # FAQ accordion
+│   │   │   ├── JoinUs/                # Value proposition section
+│   │   │   ├── ReachUs/               # Demo request form
+│   │   │   └── Resources/             # Industry insights slider
+│   │   │
+│   │   ├── ProductNavigation/         # Category bar + mega-menu
+│   │   ├── Product/                   # ProductCard, ProductHoverCard, ProductVariants
+│   │   ├── Filter/                    # FilterMenu, FilterAccordian, FilterSelect, FilterPrice
+│   │   ├── Compare/                   # CompareBtn, CompareTray
+│   │   ├── WishlistIcon/              # Wishlist toggle buttons
+│   │   ├── Notifications/             # NotificationBell, NotificationPopup
+│   │   ├── MoodboardComponent/        # Canvas editor components
+│   │   ├── Footer/                    # Footer, Footer1
+│   │   ├── Inputs/                    # CustInput, Input, Search, SpaceDropDown
+│   │   ├── Pagination/                # Page navigation
+│   │   ├── PasswordRequirements/      # Password strength indicator
+│   │   ├── Loader/                    # Loading spinner
+│   │   ├── TrialTimer/                # Trial countdown timer
+│   │   ├── Explore/                   # SectionHeader
+│   │   ├── ui/                        # Radix-based primitives (button, slider, sonner)
+│   │   └── pages/Dashboard/Home/      # Dashboard home section
+│   │
+│   ├── store/                         # Redux store
+│   │   ├── store.js                   # Store configuration
+│   │   └── slice/                     # Redux Toolkit slices
+│   │       ├── user.js                # User profile, projects, uploads
+│   │       ├── signup.js              # Signup &amp; login flows
+│   │       ├── productNav.js          # Categories, filters, products
+│   │       ├── wishlist.js            # Wishlist items
+│   │       ├── customProduct.js       # Custom product CRUD
+│   │       ├── companyMembers.js      # Team member management
+│   │       ├── ordersheet.js          # Export/order sheet creation
+│   │       ├── projectBank.js         # Project bank operations
+│   │       ├── compareSlice.js        # Compare tray (client-side only)
+│   │       ├── moodboard.js           # Moodboard canvas state
+│   │       ├── modal.js               # Address modal state
+│   │       └── appState.js            # Global loading states
+│   │
+│   ├── utils/                         # Utility modules
+│   │   ├── axiosConfig.js             # Axios interceptors (token, 401 handling)
+│   │   ├── rbacUtils.js               # Role-based access control helpers
+│   │   ├── utils.js                   # Base URL config, app control settings
+│   │   └── skuAttributeMapping.js     # Category-to-attribute mapping
+│   │
+│   ├── customHooks/                   # Custom React hooks
+│   │   ├── useQueryParams.js          # URL query parameter management
+│   │   ├── useWindowLayout.js         # Window dimension tracking
+│   │   ├── useGlobalLoader.js         # Global loading state hook
+│   │   ├── useNavigationWithQuery.js  # Navigate while preserving query params
+│   │   ├── useSmartPosition.js        # Smart positioning for hover cards
+│   │   └── scrollTop.js              # Scroll-to-top utility
+│   │
+│   ├── style/                         # SCSS stylesheets
+│   │   ├── main.scss / main.css       # Entry stylesheet
+│   │   ├── utils/                     # _color.scss, _font.scss, _breakpoints.scss
+│   │   ├── components/                # _navbar.scss, _productNavigation.scss, _footer.scss
+│   │   ├── page/                      # _dashboard.scss, _projects.scss, _profile.scss, etc.
+│   │   └── oldstyle/                  # Legacy stylesheets (being phased out)
+│   │
+│   ├── data/                          # Static data files
+│   │   └── category_key_map.json      # Category &rarr; attribute display mapping
+│   │
+│   └── assets/                        # Static assets (images, SVGs, icons)
+│       ├── Image/SvgCollection.jsx    # Centralized SVG icon components
+│       ├── landing/                   # Landing page images
+│       ├── home-images/               # Dashboard section images
+│       ├── icons/                     # Social media icons
+│       └── favicon/                   # Browser tab icon</pre>
+</section>
+
+<section id="fe-configuration">
+  <h2>Configuration</h2>
+
+  <h3>Vite Configuration</h3>
+  <p>File: <code>vite.config.js</code></p>
+  <div class="card">
+    <ul>
+      <li><strong>React Plugin</strong> &mdash; <code>@vitejs/plugin-react</code> for JSX transform and Fast Refresh</li>
+      <li><strong>SVGR Plugin</strong> &mdash; <code>vite-plugin-svgr</code> imports SVG files as React components</li>
+      <li><strong>Path Alias</strong> &mdash; <code>@/</code> maps to <code>src/</code> for clean imports</li>
+      <li><strong>esbuild Loader</strong> &mdash; Configured for TSX to process both TypeScript and JavaScript files</li>
+      <li><strong>Server</strong> &mdash; Runs on port <code>5173</code>, bound to <code>0.0.0.0</code>, all hosts allowed</li>
+    </ul>
+  </div>
+
+  <h3>Environment Variables</h3>
+  <p>The frontend uses Vite's <code>import.meta.env</code> system for environment-specific configuration.</p>
+  <table>
+    <thead><tr><th>Variable</th><th>Required</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td><code>VITE_MODE</code></td><td>No</td><td>Set to <code>"development"</code> to use the dev API URL. Otherwise defaults to production.</td></tr>
+      <tr><td><code>VITE_API_DEV_URL</code></td><td>No</td><td>Backend API base URL for development.</td></tr>
+      <tr><td><code>VITE_API_PROD_URL</code></td><td>No</td><td>Backend API base URL for production.</td></tr>
+    </tbody>
+  </table>
+  <div class="warn"><strong>Hardcoded URLs:</strong> Many files currently hardcode <code>https://materialogue-api.test-server.app</code> directly instead of using the central <code>base_url</code> from <code>utils.js</code>. This should be refactored to use the shared constant for consistency.</div>
+
+  <h3>Key NPM Scripts</h3>
+  <table>
+    <thead><tr><th>Script</th><th>Command</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td><code>npm run dev</code></td><td><code>vite</code></td><td>Start development server with hot reload</td></tr>
+      <tr><td><code>npm run build</code></td><td><code>vite build</code></td><td>Production build to <code>dist/</code></td></tr>
+      <tr><td><code>npm run preview</code></td><td><code>vite preview</code></td><td>Preview production build locally</td></tr>
+      <tr><td><code>npm run lint</code></td><td><code>eslint .</code></td><td>Run ESLint code quality checks</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ==================== ROUTING & LAYOUT ==================== -->
+
+<section id="fe-routing">
+  <h2>Route Map</h2>
+  <p>All routes are defined in <code>src/Layout.jsx</code> using React Router v6's <code>useRoutes</code> hook. The layout wraps each page with the appropriate navbar and footer combination.</p>
+
+  <h3>Public Routes</h3>
+  <table class="route-table">
+    <thead><tr><th>Path</th><th>Page Component</th><th>Layout</th></tr></thead>
+    <tbody>
+      <tr><td><code>/</code></td><td>LandingPage</td><td>Landing Navbar + All Sections</td></tr>
+      <tr><td><code>/explore</code></td><td>Dashboard</td><td>Navbar + ProductNavigation + Footer</td></tr>
+      <tr><td><code>/product/:product_id?</code></td><td>ProductByID</td><td>Navbar</td></tr>
+      <tr><td><code>/brand/:brand_id</code></td><td>BrandInfo</td><td>Navbar + Footer</td></tr>
+      <tr><td><code>/compare-products</code></td><td>ComparePage</td><td>Navbar + Footer</td></tr>
+      <tr><td><code>/notification</code></td><td>Notification</td><td>Navbar + ProductNavigation</td></tr>
+      <tr><td><code>/project-bank/:project_id</code></td><td>ProjectBank</td><td>Navbar + Footer</td></tr>
+      <tr><td><code>/profile/:page?</code></td><td>Profile</td><td>Navbar + ProductNavigation</td></tr>
+      <tr><td><code>/mood-board/:mood_board_id?</code></td><td>MoodBoard</td><td>Standalone</td></tr>
+      <tr><td><code>/custom-product/:id</code></td><td>CustomProductByID</td><td>Navbar</td></tr>
+      <tr><td><code>/aboutUs</code></td><td>AboutUs</td><td>Landing Navbar</td></tr>
+      <tr><td><code>/faqs</code></td><td>FAQs</td><td>Landing Navbar</td></tr>
+      <tr><td><code>/connect</code></td><td>JoinUs</td><td>Landing Navbar</td></tr>
+      <tr><td><code>/privacy-policy</code></td><td>PrivacyPolicy</td><td>Landing Navbar</td></tr>
+      <tr><td><code>/cookie-policy</code></td><td>CookiePolicy</td><td>Landing Navbar</td></tr>
+      <tr><td><code>/terms-of-use</code></td><td>TermsOfUse</td><td>Landing Navbar</td></tr>
+      <tr><td><code>/blogs/...</code></td><td>BlogPost</td><td>Landing Navbar</td></tr>
+      <tr><td><code>/tutorials/create-project</code></td><td>Project Tutorial</td><td>Landing Navbar</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Auth Routes</h3>
+  <table class="route-table">
+    <thead><tr><th>Path</th><th>Page Component</th><th>Layout</th></tr></thead>
+    <tbody>
+      <tr><td><code>/signup/:type?/:page?</code></td><td>CommonSignup</td><td>SignUpPage (LeftSection + Form)</td></tr>
+      <tr><td><code>/login/:type?/:page?</code></td><td>CommonLogin</td><td>LoginPages (LeftSection + Form)</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Protected Routes <span class="badge badge-protected">Login Required</span></h3>
+  <table class="route-table">
+    <thead><tr><th>Path</th><th>Page Component</th><th>Layout</th></tr></thead>
+    <tbody>
+      <tr><td><code>/wishlist</code></td><td>Wishlist</td><td>Navbar + Footer</td></tr>
+      <tr><td><code>/custom-products</code></td><td>CustomProducts</td><td>Navbar</td></tr>
+      <tr><td><code>/projects/:project_id?</code></td><td>Projects</td><td>Navbar + Footer</td></tr>
+      <tr><td><code>/projects/:project_id/exports</code></td><td>ExportsPage</td><td>Navbar + Footer</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="fe-layout-system">
+  <h2>Layout System</h2>
+  <p>The app uses two distinct navigation layouts depending on the context:</p>
+
+  <div class="rel-grid">
+    <div class="rel-card">
+      <h4>Landing Navbar</h4>
+      <p>Used on the marketing/public pages (<code>/</code>, <code>/aboutUs</code>, <code>/faqs</code>, <code>/connect</code>). Contains the logo, About Us, Connect with Us, FAQ's links, and prominent Login / Start for Free buttons. Includes a mobile hamburger menu for screens under 600px.</p>
+    </div>
+    <div class="rel-card">
+      <h4>App Navbar</h4>
+      <p>Used on all authenticated/product pages (<code>/explore</code>, <code>/projects</code>, <code>/profile</code>). Contains the logo, notification bell (with unread badge), Wishlist link, Projects link, and user profile avatar. Clicking the logo navigates to <code>/explore</code> and resets all product filters.</p>
+    </div>
+    <div class="rel-card">
+      <h4>ProductNavigation</h4>
+      <p>A secondary horizontal bar displayed directly below the App Navbar on <code>/explore</code> and <code>/profile</code>. Shows category icons (Walls &amp; Floor, Sanitary, Paints, etc.). On hover, a mega-menu dropdown appears with sub-categories and sub-sub-categories.</p>
+    </div>
+    <div class="rel-card">
+      <h4>Footer</h4>
+      <p><code>Footer1</code> is rendered on most full-page views (Dashboard, Projects, Wishlist, etc.). Contains branding, social links, and legal links (Terms, Privacy Policy, Cookie Policy).</p>
+    </div>
+  </div>
+</section>
+
+<section id="fe-protected-routes">
+  <h2>Protected Routes</h2>
+  <p>The <code>ProtectedRoute</code> component wraps routes that require authentication. It checks for a <code>token</code> in <code>localStorage</code> &mdash; if missing, the user is redirected to <code>/login</code>.</p>
+  <pre>
+const ProtectedRoute = ({ children }) => {
+  const token = localStorage.getItem("token");
+  if (!token) {
+    return &lt;Navigate to="/login" replace /&gt;;
+  }
+  return children;
+};</pre>
+  <p>Currently protected: <code>/wishlist</code>, <code>/custom-products</code>, <code>/projects/:project_id?</code>, <code>/projects/:project_id/exports</code>.</p>
+  <div class="note"><strong>Note:</strong> Some pages like <code>/profile</code> and <code>/notification</code> are not formally protected at the route level but depend on user data from Redux &mdash; they'll show empty content if not logged in.</div>
+</section>
+
+<!-- ==================== STATE MANAGEMENT ==================== -->
+
+<section id="fe-redux-overview">
+  <h2>Redux State Management</h2>
+  <p>The application uses Redux Toolkit for centralized state management. The store is configured in <code>src/store/store.js</code> and provides 12 slices, each managing a specific domain. Async operations are handled via <code>createAsyncThunk</code> which integrates cleanly with the loading/error lifecycle.</p>
+
+  <div class="flow-diagram">
+    <div class="flow-box highlight"><strong>Component</strong><span>useSelector / useDispatch</span></div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-box"><strong>Dispatch Action</strong><span>createAsyncThunk</span></div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-box"><strong>Axios API Call</strong><span>GET / POST / PUT / DELETE</span></div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-box highlight"><strong>Redux State Updated</strong><span>extraReducers</span></div>
+  </div>
+
+  <div class="note"><strong>Full state reset:</strong> Dispatching <code>{ type: "LOGOUT" }</code> resets all Redux state back to initial values. This is triggered when the user logs out or their session expires.</div>
+</section>
+
+<section id="fe-slice-user">
+  <h2>User Slice</h2>
+  <p>The central slice for the authenticated user. Manages profile data, project operations, and file uploads. Initializes the token from <code>localStorage</code> on app load.</p>
+  <p>File: <code>src/store/slice/user.js</code></p>
+
+  <h4>State Shape</h4>
+  <table>
+    <thead><tr><th>Key</th><th>Type</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td><code>data</code></td><td>Object</td><td>Full user profile (name, email, type, company, projects, wishlist, etc.)</td></tr>
+      <tr><td><code>token</code></td><td>String</td><td>JWT token loaded from localStorage</td></tr>
+      <tr><td><code>project_by_id</code></td><td>Object</td><td>Deep detail of a single project (spaces, products, exports)</td></tr>
+      <tr><td><code>isLoading</code></td><td>Boolean</td><td>Loading state for profile operations</td></tr>
+    </tbody>
+  </table>
+
+  <h4>Async Thunks</h4>
+  <table>
+    <thead><tr><th>Thunk</th><th>API Endpoint</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td><code>getUsetDataByToken</code></td><td><code>GET /customer/profile</code></td><td>Fetch logged-in user's profile</td></tr>
+      <tr><td><code>getUsetProjectsByToken</code></td><td><code>GET /customer/projects</code></td><td>Fetch user's project list</td></tr>
+      <tr><td><code>updateUserProfile</code></td><td><code>PUT /customer/profile</code></td><td>Update profile fields</td></tr>
+      <tr><td><code>addProject</code></td><td><code>POST /customer/projects</code></td><td>Create a new project</td></tr>
+      <tr><td><code>getProjectsById</code></td><td><code>GET /customer/projects/:id</code></td><td>Fetch single project with full detail</td></tr>
+      <tr><td><code>deleteProject</code></td><td><code>PUT /customer/projects/:id/soft-delete</code></td><td>Soft-delete a project</td></tr>
+      <tr><td><code>addSpaceToProject</code></td><td><code>POST /.../spaces</code></td><td>Add a space to a project</td></tr>
+      <tr><td><code>addProductToSpace</code></td><td><code>POST /.../spaces/:spaceId/products</code></td><td>Assign product to a space</td></tr>
+      <tr><td><code>uploadLogo</code></td><td><code>POST /customer/upload/photo</code></td><td>Upload profile photo</td></tr>
+      <tr><td><code>uploadArchitectureRegistration</code></td><td><code>POST /customer/upload/architecture-registration</code></td><td>Upload professional credential</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="fe-slice-signup">
+  <h2>Signup Slice</h2>
+  <p>Manages the transient state during signup and login flows. Stores temporary user data, OTP status, and submission progress. Cleared after successful authentication.</p>
+  <p>File: <code>src/store/slice/signup.js</code></p>
+
+  <h4>Async Thunks</h4>
+  <table>
+    <thead><tr><th>Thunk</th><th>API Endpoint</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td><code>submitUserData</code></td><td><code>POST /auth/signup</code></td><td>Submit registration details (creates TempUser + sends OTP)</td></tr>
+      <tr><td><code>verifyOTP</code></td><td><code>POST /auth/verify</code></td><td>Verify OTP and create permanent user</td></tr>
+      <tr><td><code>loginUser</code></td><td><code>POST /auth/login</code></td><td>Login with email + password, returns JWT</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="fe-slice-productNav">
+  <h2>ProductNav Slice</h2>
+  <p>The most complex slice &mdash; manages the entire product catalog experience including category tree, active navigation breadcrumbs, filtered product results, and available filter options.</p>
+  <p>File: <code>src/store/slice/productNav.js</code></p>
+
+  <h4>State Shape</h4>
+  <table>
+    <thead><tr><th>Key</th><th>Type</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td><code>data</code></td><td>Array</td><td>Full category tree (categories &rarr; sub-categories &rarr; sub-sub-categories)</td></tr>
+      <tr><td><code>data_obj</code></td><td>Object</td><td>Category data indexed by ID for fast lookup</td></tr>
+      <tr><td><code>nav</code></td><td>Object</td><td>Current selection: <code>{ category, sub_category, sub_sub_category }</code></td></tr>
+      <tr><td><code>products</code></td><td>Array</td><td>Filtered product results for the current view</td></tr>
+      <tr><td><code>filters_to_show</code></td><td>Object</td><td>Available filter options based on current selection (cross-filtered)</td></tr>
+    </tbody>
+  </table>
+
+  <h4>Async Thunks</h4>
+  <table>
+    <thead><tr><th>Thunk</th><th>API Endpoint</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td><code>fetchNavigationData</code></td><td><code>GET /category</code></td><td>Fetch full category tree (called once on app load)</td></tr>
+      <tr><td><code>GetFilteredProducts</code></td><td><code>POST /products/withFilters</code></td><td>Fetch products with cross-filtering</td></tr>
+      <tr><td><code>fetchProductById</code></td><td><code>GET /products/:id</code></td><td>Fetch single product detail + variants</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="fe-slice-wishlist">
+  <h2>Wishlist Slice</h2>
+  <p>Manages the user's saved/favorited products. Uses optimistic UI updates for instant visual feedback.</p>
+  <p>File: <code>src/store/slice/wishlist.js</code></p>
+
+  <h4>Async Thunks</h4>
+  <table>
+    <thead><tr><th>Thunk</th><th>API Endpoint</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td><code>getWishlist</code></td><td><code>GET /customer/wishlist</code></td><td>Fetch all wishlist items with full product details</td></tr>
+      <tr><td><code>addToWishlist</code></td><td><code>POST /customer/wishlist/add/:productId</code></td><td>Add product to wishlist</td></tr>
+      <tr><td><code>removeFromWishlist</code></td><td><code>POST /customer/wishlist/remove/:productId</code></td><td>Remove product from wishlist</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="fe-slice-customProduct">
+  <h2>CustomProduct Slice</h2>
+  <p>CRUD operations for user-created products that aren't in the main catalog.</p>
+  <p>File: <code>src/store/slice/customProduct.js</code></p>
+
+  <h4>Async Thunks</h4>
+  <table>
+    <thead><tr><th>Thunk</th><th>API Endpoint</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td><code>postCustomProduct</code></td><td><code>POST /customProducts</code></td><td>Create custom product</td></tr>
+      <tr><td><code>getAllCustomProducts</code></td><td><code>GET /customProducts</code></td><td>List user's custom products</td></tr>
+      <tr><td><code>getCustomProductById</code></td><td><code>GET /customProducts/:id</code></td><td>Get single custom product</td></tr>
+      <tr><td><code>editCustomProduct</code></td><td><code>PUT /customProducts/:id</code></td><td>Update custom product</td></tr>
+      <tr><td><code>deleteCustomProduct</code></td><td><code>DELETE /customProducts/:id</code></td><td>Delete custom product</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="fe-slice-companyMembers">
+  <h2>CompanyMembers Slice</h2>
+  <p>Handles team management within a company workspace. Provides CRUD for adding, editing, and removing members, plus password reset functionality.</p>
+  <p>File: <code>src/store/slice/companyMembers.js</code></p>
+
+  <h4>Async Thunks</h4>
+  <table>
+    <thead><tr><th>Thunk</th><th>API Endpoint</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td><code>getCompanyMembers</code></td><td><code>GET /company/members</code></td><td>Fetch team member list</td></tr>
+      <tr><td><code>addCompanyMember</code></td><td><code>POST /company/members</code></td><td>Add member (triggers welcome email)</td></tr>
+      <tr><td><code>updateCompanyMember</code></td><td><code>PUT /company/members</code></td><td>Update member details</td></tr>
+      <tr><td><code>removeCompanyMember</code></td><td><code>DELETE /company/members/:id</code></td><td>Remove member from company</td></tr>
+      <tr><td><code>resetMemberPassword</code></td><td><code>POST /company/members/reset-password</code></td><td>Reset a member's password</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="fe-slice-ordersheet">
+  <h2>OrderSheet Slice</h2>
+  <p>Handles export document creation and quotation request tracking.</p>
+  <p>File: <code>src/store/slice/ordersheet.js</code></p>
+
+  <h4>Async Thunks</h4>
+  <table>
+    <thead><tr><th>Thunk</th><th>API Endpoint</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td><code>createOrderSheet</code></td><td><code>POST /customer/projects/:projectId/exports</code></td><td>Create a new export</td></tr>
+      <tr><td><code>markOrderSheetSent</code></td><td><code>POST /.../order-sheet/:id/mark-sent</code></td><td>Mark quotation request as sent</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="fe-slice-projectBank">
+  <h2>ProjectBank Slice</h2>
+  <p>Manages the "project bank" &mdash; a holding area for products the designer is considering for a project but hasn't assigned to a specific space yet.</p>
+  <p>File: <code>src/store/slice/projectBank.js</code></p>
+
+  <h4>Async Thunks</h4>
+  <table>
+    <thead><tr><th>Thunk</th><th>API Endpoint</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td><code>addProductToProjectBank</code></td><td><code>POST /.../project-bank/:productId</code></td><td>Add product to bank</td></tr>
+      <tr><td><code>deleteProductFromProjectBank</code></td><td><code>DELETE /.../project-bank/:productId</code></td><td>Remove product from bank</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="fe-slice-others">
+  <h2>Other Slices</h2>
+
+  <div class="rel-grid">
+    <div class="rel-card">
+      <h4>compareSlice.js</h4>
+      <p>Client-side only &mdash; no API calls. Manages an array of up to 4 products selected for comparison. Validates that all products share the same category before allowing addition.</p>
+    </div>
+    <div class="rel-card">
+      <h4>moodboard.js</h4>
+      <p>Manages moodboard canvas state: selected products, images, background color, canvas settings, and logo. Uses <code>POST /customer/projects/:projectId/moodboard</code> to save.</p>
+    </div>
+    <div class="rel-card">
+      <h4>modal.js</h4>
+      <p>Simple UI state for the address modal: <code>isOpen</code>, <code>type</code> (registered/shipping), and <code>addressData</code>. No API calls.</p>
+    </div>
+    <div class="rel-card">
+      <h4>appState.js</h4>
+      <p>Global application state: loading indicators and <code>globalLoading</code> overlay flag. Used by the <code>useGlobalLoader</code> hook.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== AUTHENTICATION ==================== -->
+
+<section id="fe-auth-signup">
+  <h2>Signup Flow</h2>
+  <p>The signup process is a multi-step wizard with validation at each stage. All signup pages live in <code>src/pages/CreateAccount/Signup/</code>.</p>
+
+  <div class="card">
+    <div class="journey-step">
+      <div class="journey-num">1</div>
+      <div class="journey-content">
+        <strong>Type Selection (<code>SelectionType.jsx</code>)</strong>
+        <p>User chooses between "Individual" (solo designer) or "Company" (design firm with team).</p>
+      </div>
+    </div>
+    <div class="journey-connector"></div>
+    <div class="journey-step">
+      <div class="journey-num">2</div>
+      <div class="journey-content">
+        <strong>Details Entry (<code>IndividualDetail.jsx</code> / <code>CompanyDetail.jsx</code>)</strong>
+        <p>User fills in: First Name, Last Name, Email, Phone Number, Business Name (Company only), Password, and Confirm Password. All fields are validated inline.</p>
+      </div>
+    </div>
+    <div class="journey-connector"></div>
+    <div class="journey-step">
+      <div class="journey-num">3</div>
+      <div class="journey-content">
+        <strong>OTP Verification (<code>VerifyOtp.jsx</code>)</strong>
+        <p>A 6-digit OTP is sent to the user's email. On verification, a JWT token is returned and stored in <code>localStorage</code>.</p>
+      </div>
+    </div>
+    <div class="journey-connector"></div>
+    <div class="journey-step">
+      <div class="journey-num">4</div>
+      <div class="journey-content">
+        <strong>Profile Registration (<code>Registration.jsx</code>)</strong>
+        <p>Optional step: upload Website URL, Instagram, LinkedIn, and professional documents (Architecture Registration, Interior Design Degree, Architecture Degree). User must complete at least 2 fields to proceed.</p>
+      </div>
+    </div>
+  </div>
+
+  <h3>Password Validation Rules</h3>
+  <p>Enforced in both signup and password reset forms via inline validation:</p>
+  <div class="card">
+    <ul>
+      <li>Minimum <strong>8 characters</strong></li>
+      <li>At least one <strong>uppercase</strong> letter</li>
+      <li>At least one <strong>lowercase</strong> letter</li>
+      <li>At least one <strong>number</strong></li>
+      <li>At least one <strong>special character</strong> from: <code>@$!%*?&amp;#</code></li>
+    </ul>
+  </div>
+  <p>A <code>PasswordRequirements</code> component (<code>src/components/PasswordRequirements/</code>) provides real-time visual feedback showing which criteria the entered password satisfies.</p>
+</section>
+
+<section id="fe-auth-login">
+  <h2>Login Flow</h2>
+  <p>The login process uses a two-step flow in <code>src/pages/CreateAccount/Login/</code>.</p>
+
+  <div class="card">
+    <div class="journey-step">
+      <div class="journey-num">1</div>
+      <div class="journey-content">
+        <strong>Identifier Entry (<code>LoginSection.jsx</code>)</strong>
+        <p>User enters their email or mobile number. If an email is provided, they proceed to the password step.</p>
+      </div>
+    </div>
+    <div class="journey-connector"></div>
+    <div class="journey-step">
+      <div class="journey-num">2</div>
+      <div class="journey-content">
+        <strong>Password Entry (<code>PasswordSection.jsx</code>)</strong>
+        <p>User enters their password. On successful login, the JWT token and user object are saved to <code>localStorage</code>, the Redux <code>user</code> slice is updated, and the user is redirected to <code>/explore</code>.</p>
+      </div>
+    </div>
+  </div>
+
+  <h4>Login &mdash; Data Flow</h4>
+  <pre>
+// 1. User submits email + password
+dispatch(loginUser({ email, password }))
+
+// 2. signup.js thunk calls POST /auth/login
+// 3. On success, stores token and user data:
+localStorage.setItem("token", response.data.token)
+localStorage.setItem("user", JSON.stringify(response.data.user))
+
+// 4. Navigates to /explore
+navigate("/explore")</pre>
+</section>
+
+<section id="fe-auth-password-reset">
+  <h2>Password Reset Flow</h2>
+  <p>Three-step process for forgotten passwords, handled in <code>ForgetPassword.jsx</code> and <code>ResetPassword.jsx</code>.</p>
+
+  <div class="card">
+    <div class="journey-step">
+      <div class="journey-num">1</div>
+      <div class="journey-content">
+        <strong>Request Reset</strong>
+        <p>User enters their email. The backend sends a reset OTP.</p>
+        <p><code>POST /auth/reset-password</code></p>
+      </div>
+    </div>
+    <div class="journey-connector"></div>
+    <div class="journey-step">
+      <div class="journey-num">2</div>
+      <div class="journey-content">
+        <strong>Verify OTP</strong>
+        <p>User enters the 6-digit OTP received via email.</p>
+        <p><code>POST /auth/verify-reset-password</code></p>
+      </div>
+    </div>
+    <div class="journey-connector"></div>
+    <div class="journey-step">
+      <div class="journey-num">3</div>
+      <div class="journey-content">
+        <strong>Set New Password</strong>
+        <p>User enters a new password (same validation rules as signup). On success, redirected to a welcome/confirmation page.</p>
+        <p><code>POST /auth/set-new-password</code></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="fe-auth-interceptors">
+  <h2>Axios Interceptors</h2>
+  <p>File: <code>src/utils/axiosConfig.js</code></p>
+  <p>Two interceptors are configured globally on the Axios instance:</p>
+
+  <div class="card">
+    <h4>Request Interceptor</h4>
+    <p>Automatically attaches the JWT token from <code>localStorage</code> to every outgoing request as an <code>Authorization: Bearer &lt;token&gt;</code> header.</p>
+  </div>
+
+  <div class="card">
+    <h4>Response Interceptor</h4>
+    <p>Handles error responses globally:</p>
+    <ul>
+      <li><strong>401 Unauthorized</strong> &mdash; Clears <code>localStorage</code>, shows a "session expired" toast, and redirects to <code>/login</code> after 1.5 seconds. Skips this logic for auth endpoints (login/signup/verify) to avoid redirect loops.</li>
+      <li><strong>403 Forbidden</strong> &mdash; Shows a "no permission" toast message.</li>
+    </ul>
+  </div>
+  <div class="note"><strong>Duplicate prevention:</strong> A <code>isLoggingOut</code> flag prevents multiple toast notifications and redirects from firing simultaneously during a 401 cascade.</div>
+</section>
+
+<!-- ==================== PAGES & FEATURES ==================== -->
+
+<section id="fe-landing-page">
+  <h2>Landing Page</h2>
+  <p>The marketing homepage (<code>/</code>) is a full-page scroll-snap experience built from composable sections. It uses the Landing Navbar and showcases the platform's value proposition to new visitors.</p>
+  <p>Entry: <code>src/pages/CreateAccount/Signup/LandingPage.jsx</code></p>
+
+  <div class="card">
+    <h4>Sections (in order)</h4>
+    <table>
+      <thead><tr><th>Section</th><th>Component</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td>Hero</td><td><code>Home.jsx</code></td><td>"Material Made Easy" header with a <code>react-slick</code> image slider and interactive PopCard hotspots showing product details</td></tr>
+        <tr><td>How It Works</td><td><code>HowItWorks.jsx</code></td><td>Interactive tabbed walkthrough with three pillars: <strong>Select</strong> (Explore, Discover, Compare), <strong>Manage</strong> (Create, Organise, Export), <strong>Procure</strong> (Approval, Quotes, Connect). Auto-advancing progress bars.</td></tr>
+        <tr><td>Categories</td><td><code>Categories.jsx</code></td><td>Grid of material categories with hover-to-reveal sub-menus</td></tr>
+        <tr><td>Brands</td><td><code>Brands.jsx</code></td><td>Continuous scrolling marquee of brand partner logos using Framer Motion</td></tr>
+        <tr><td>Join Us</td><td><code>JoinUs.jsx</code></td><td>"Why join us?" value proposition section</td></tr>
+        <tr><td>Reach Us</td><td><code>ReachUs.jsx</code></td><td>"Request a Demo" email capture form (submits to Google Script)</td></tr>
+        <tr><td>Reviews</td><td><code>Reviews.jsx</code></td><td>Designer testimonial cards with a ReviewSystem carousel</td></tr>
+        <tr><td>Resources</td><td><code>Resources.jsx</code></td><td>Industry insights article slider</td></tr>
+        <tr><td>FAQ</td><td><code>Question.jsx</code></td><td>Accordion FAQ organized by category: General, Materials, Project Management, Pricing, Security, Sustainability, Technical Support</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="fe-dashboard">
+  <h2>Dashboard / Explore</h2>
+  <p>The main authenticated view at <code>/explore</code>. This is where designers spend most of their time &mdash; browsing products, managing projects, and discovering new materials.</p>
+  <p>File: <code>src/components/pages/Dashboard/Home/Home.jsx</code></p>
+
+  <div class="card">
+    <h4>Dashboard Sections</h4>
+    <ul>
+      <li><strong>Product Showcase</strong> &mdash; Horizontal scrollable carousel of featured products with smart scroll-hijacking (horizontal scroll before vertical scroll resumes)</li>
+      <li><strong>Projects Listing</strong> &mdash; Shows the user's active/archived projects in a card layout with "Create New" button. Supports sorting (Newest/Oldest/Name) and project actions (archive, duplicate, rename, delete)</li>
+      <li><strong>Trending Section</strong> &mdash; Horizontal slider for industry insights and articles</li>
+      <li><strong>Custom Products</strong> &mdash; Quick-access section for the user's custom product entries</li>
+    </ul>
+  </div>
+  <div class="note"><strong>Category Navigation:</strong> The <code>ProductNavigation</code> bar above the dashboard lets users jump directly into category-filtered product views. Selecting a category updates URL query parameters, which triggers the <code>GetFilteredProducts</code> thunk.</div>
+</section>
+
+<section id="fe-product-catalog">
+  <h2>Product Catalog</h2>
+  <p>The product catalog system spans several components that work together to provide a rich browsing experience.</p>
+
+  <h3>Product Detail Page</h3>
+  <p>File: <code>src/pages/Product/ProductByID.jsx</code></p>
+  <div class="card">
+    <ul>
+      <li><strong>Image Gallery</strong> &mdash; Main image with hover-to-zoom effect (zoom box follows cursor position). Thumbnail strip below for switching between product images.</li>
+      <li><strong>Product Variants</strong> &mdash; Products sharing the same <code>primary_sku</code> are grouped as variants. Users can switch between color/size variants using the <code>ProductVariants</code> component.</li>
+      <li><strong>Specifications</strong> &mdash; Displays all available product attributes: brand, category, sub-category, price, color, finish, material, size, thickness, etc.</li>
+      <li><strong>Downloadable Resources</strong> &mdash; Spec Sheet, HD Textures, and Installation Guide links. Shows "disabled" state if files aren't available.</li>
+      <li><strong>Add to Project</strong> &mdash; Opens <code>AddToProjectModal</code> where the user selects a project and a space (room) to place the product in, with quantity input.</li>
+      <li><strong>Breadcrumb Navigation</strong> &mdash; Shows Category &rarr; Sub-Category &rarr; Secondary Sub-Category hierarchy for orientation.</li>
+    </ul>
+  </div>
+
+  <h3>Product Cards</h3>
+  <div class="rel-grid">
+    <div class="rel-card">
+      <h4>ProductCard</h4>
+      <p>The standard grid item used in catalog views. Displays the primary image, brand, product name, and price. Includes a wishlist toggle button and a compare button (visible on hover). Clicking navigates to the full detail page.</p>
+    </div>
+    <div class="rel-card">
+      <h4>ProductHoverCard</h4>
+      <p>Appears on card hover with additional details: price, brand, and two category-specific attributes (<code>key1</code>/<code>key2</code> from <code>skuAttributeMapping.js</code>). When viewed inside a project, includes a status dropdown (Approved/Proposed/Rejected). Uses the <code>useSmartPosition</code> hook to stay within viewport bounds.</p>
+    </div>
+  </div>
+</section>
+
+<section id="fe-filtering">
+  <h2>Filtering System</h2>
+  <p>The filtering system lets users narrow down the product catalog using multiple criteria. It connects the ProductNavigation (category selection) with the FilterMenu (attribute filters) and the Dashboard product grid.</p>
+
+  <h3>Components</h3>
+  <table>
+    <thead><tr><th>Component</th><th>File</th><th>Role</th></tr></thead>
+    <tbody>
+      <tr><td><code>ProductNavigation</code></td><td><code>ProductNavigation.jsx</code></td><td>Horizontal category bar with hover mega-menu. Sets category/sub-category via URL query params.</td></tr>
+      <tr><td><code>ProductFilter</code></td><td><code>ProductFilter.jsx</code></td><td>Wrapper that conditionally renders <code>FilterMenu</code> when filters are available.</td></tr>
+      <tr><td><code>FilterMenu</code></td><td><code>FilterMenu.jsx</code></td><td>Vertical filter sidebar. Sorts "Brand" to the top and follows a predefined category order. Renders each filter group as a <code>FilterAccordian</code>.</td></tr>
+      <tr><td><code>FilterAccordian</code></td><td><code>FilterAccordian.jsx</code></td><td>Collapsible filter section. Uses <code>FilterSelect</code> for text/color options and <code>FilterPrice</code> for price range sliders.</td></tr>
+      <tr><td><code>FilterSelect</code></td><td><code>FilterSelect.jsx</code></td><td>Checkbox list for selecting filter values (brand names, colors, finishes, etc.).</td></tr>
+      <tr><td><code>FilterPrice</code></td><td><code>FilterPrice.jsx</code></td><td>Dual-handle range slider for price min/max filtering.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>How Filtering Works</h3>
+  <div class="card">
+    <div class="journey-step">
+      <div class="journey-num">1</div>
+      <div class="journey-content">
+        <strong>Category Selection</strong>
+        <p>User hovers on a category in <code>ProductNavigation</code> and clicks a sub-sub-category. This updates URL query parameters via the <code>useQueryParams</code> hook.</p>
+      </div>
+    </div>
+    <div class="journey-step">
+      <div class="journey-num">2</div>
+      <div class="journey-content">
+        <strong>Filter Application</strong>
+        <p>Selecting filter values (brand, color, etc.) in the <code>FilterMenu</code> also updates query params. The Dashboard component watches for query param changes.</p>
+      </div>
+    </div>
+    <div class="journey-step">
+      <div class="journey-num">3</div>
+      <div class="journey-content">
+        <strong>API Request</strong>
+        <p>On any change, <code>GetFilteredProducts</code> is dispatched which calls <code>POST /products/withFilters</code> with the current category, filters, page, and sort parameters.</p>
+      </div>
+    </div>
+    <div class="journey-step">
+      <div class="journey-num">4</div>
+      <div class="journey-content">
+        <strong>Cross-Filtered Response</strong>
+        <p>The API returns matching products AND updated filter options. If selecting "Kohler" as brand means no "Blue" products exist, "Blue" won't appear in the color filter. The <code>FilterMenu</code> re-renders with the narrowed options.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="fe-projects">
+  <h2>Projects</h2>
+  <p>The project system is the core workflow for designers. Projects represent real-world sites and contain spaces (rooms), product selections, and generated exports.</p>
+  <p>File: <code>src/pages/Projects/Projects.jsx</code></p>
+
+  <h3>Views</h3>
+  <div class="rel-grid">
+    <div class="rel-card">
+      <h4>All Projects View (Card Layout)</h4>
+      <p>Shows all projects as cards with thumbnails, names, and addresses. Users can sort by Newest/Oldest, create new projects, and access project actions via a three-dot menu (Archive, Duplicate, Rename, Delete).</p>
+    </div>
+    <div class="rel-card">
+      <h4>Single Project View (List Layout)</h4>
+      <p>When a project is opened, shows spaces on the left panel and products within the selected space on the right. Supports search, filtering by Status/Category/Brand, and product management (add, move, delete).</p>
+    </div>
+  </div>
+
+  <h3>Space Management</h3>
+  <div class="card">
+    <ul>
+      <li><strong>Create</strong> &mdash; Add spaces like "Master Bedroom", "Kitchen", "Bathroom 1" via the <code>AddSpace</code> modal</li>
+      <li><strong>Rename</strong> &mdash; Edit space names inline</li>
+      <li><strong>Duplicate</strong> &mdash; Copy a space with all its products</li>
+      <li><strong>Delete</strong> &mdash; Remove a space and all its product assignments</li>
+    </ul>
+  </div>
+
+  <h3>Product Actions (within a space)</h3>
+  <div class="card">
+    <ul>
+      <li><strong>Add</strong> &mdash; From the catalog via <code>AddToProjectModal</code>, or from the Project Bank</li>
+      <li><strong>Move</strong> &mdash; Transfer products between spaces</li>
+      <li><strong>Edit</strong> &mdash; Update quantity, unit overrides, custom notes via <code>EditProductInSpace</code></li>
+      <li><strong>Status</strong> &mdash; Set product status (Approved, Proposed, Rejected) via hover card dropdown</li>
+      <li><strong>Delete</strong> &mdash; Remove product from the space</li>
+    </ul>
+  </div>
+
+  <h3>Export Generation</h3>
+  <p>From the project view, users can select specific products or entire spaces and trigger export generation. This creates an export record on the backend and generates PDF/Excel documents that can be downloaded from the Exports page.</p>
+</section>
+
+<section id="fe-exports">
+  <h2>Exports</h2>
+  <p>The export system provides professional document generation for sharing material selections with clients and vendors.</p>
+
+  <h3>Exports Page</h3>
+  <p>File: <code>src/pages/Projects/ExportsPage.jsx</code></p>
+  <div class="card">
+    <ul>
+      <li><strong>Table Layout</strong> &mdash; Lists all exports for a project showing name, creation date, and creator</li>
+      <li><strong>Sorting</strong> &mdash; By Date (Newest/Oldest) and Name (A-Z/Z-A)</li>
+      <li><strong>Bulk Actions</strong> &mdash; Select multiple exports for bulk deletion</li>
+      <li><strong>RBAC Integration</strong> &mdash; Edit/delete buttons respect user permissions</li>
+      <li><strong>FAQ Sidebar</strong> &mdash; Accordion with helpful instructions on how to export, get quotations, and download files</li>
+    </ul>
+  </div>
+
+  <h3>Download Options</h3>
+  <p>Each export offers three download formats via a dropdown menu:</p>
+  <table>
+    <thead><tr><th>Format</th><th>Icon</th><th>Use Case</th></tr></thead>
+    <tbody>
+      <tr><td>Order Sheet (PDF)</td><td>FileText</td><td>Tabular format for vendors and procurement</td></tr>
+      <tr><td>Selection Sheet (PDF)</td><td>File</td><td>Visual product cards for client presentations</td></tr>
+      <tr><td>Excel Spreadsheet</td><td>FileSpreadsheet</td><td>Detailed bill of materials with pricing</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Export Detail View</h3>
+  <p>File: <code>src/pages/Projects/ExportDetailView.jsx</code></p>
+  <div class="card">
+    <ul>
+      <li><strong>Card View</strong> &mdash; Image-heavy grid layout with <code>ProductHoverCard</code> on hover</li>
+      <li><strong>List View</strong> &mdash; Detailed table with SKU, description, price, brand, and category</li>
+      <li><strong>Search</strong> &mdash; Filter products within the export by name</li>
+      <li><strong>Direct Downloads</strong> &mdash; Persistent buttons for all three export format downloads</li>
+      <li><strong>Get Quotation</strong> &mdash; Action to initiate procurement for the listed items</li>
+    </ul>
+  </div>
+</section>
+
+<section id="fe-profile">
+  <h2>Profile</h2>
+  <p>The profile section (<code>/profile/:page?</code>) manages user account settings, team members, and professional documents. It uses tabbed navigation that adapts based on user type.</p>
+  <p>File: <code>src/pages/Profile/Profile.jsx</code></p>
+
+  <h3>User Types</h3>
+  <table>
+    <thead><tr><th>Type</th><th>Role</th><th>Capabilities</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Individual</strong></td><td>Solo designer</td><td>Full control of own profile and projects. Sees "Upgrade" prompt on Team Members page to convert to Company plan.</td></tr>
+      <tr><td><strong>Company</strong></td><td>Firm owner/admin</td><td>Full control of profile, projects, and team. Can add/edit/delete members, reset passwords, and assign permissions.</td></tr>
+      <tr><td><strong>Company Member</strong></td><td>Team employee</td><td>Read-only access to company details. Can view the admin but cannot manage team members. Project access controlled by RBAC permissions.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Details Subpage</h3>
+  <p>File: <code>src/pages/Profile/Details.jsx</code></p>
+  <div class="card">
+    <ul>
+      <li><strong>Personal Info</strong> &mdash; Name, email, phone, business name, website URL</li>
+      <li><strong>Logo/Photo</strong> &mdash; Profile photo upload</li>
+      <li><strong>Addresses</strong> &mdash; Registered and shipping addresses with <code>AddressModal</code> for editing</li>
+      <li><strong>Professional Documents</strong> &mdash; Upload/view Architecture Registration, Interior Design Degree, and Architecture Degree. Includes a <code>DocumentViewModal</code> for previewing PDFs and images.</li>
+      <li><strong>Company Info</strong> &mdash; GST number, social links (LinkedIn, Instagram, website)</li>
+    </ul>
+  </div>
+
+  <h3>Team Members Subpage</h3>
+  <p>File: <code>src/pages/Profile/TeamMembers.jsx</code></p>
+  <div class="card">
+    <ul>
+      <li><strong>Admin View</strong> &mdash; Shows member count (e.g., "1 of 3 members added"), an "Add Member" button, and a list of all team members with edit/delete actions</li>
+      <li><strong>Member View</strong> &mdash; Read-only view showing the company admin's info</li>
+      <li><strong>Individual View</strong> &mdash; Shows user's own card plus an "Upgrade your Account" prompt to switch to a Company plan</li>
+      <li><strong>Add Member Modal</strong> &mdash; Fields: Name, Email, Phone, Password. Triggers a welcome email to the new member.</li>
+      <li><strong>Edit Member Modal</strong> &mdash; Update name, role, phone number. Email is fixed as the unique identifier.</li>
+      <li><strong>Password Reset</strong> &mdash; Admin can reset any member's password</li>
+    </ul>
+  </div>
+</section>
+
+<section id="fe-custom-products">
+  <h2>Custom Products</h2>
+  <p>When a designer sources materials not in the Materialogue catalog (local vendors, specialty items), they can create Custom Products that work just like catalog products in projects and exports.</p>
+
+  <h3>Pages</h3>
+  <table>
+    <thead><tr><th>Page</th><th>File</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td>List View</td><td><code>CustomProducts.jsx</code></td><td>Grid of all user-created custom products with edit/delete actions</td></tr>
+      <tr><td>Add/Edit Form</td><td><code>AddProduct.jsx</code></td><td>Full product creation form with image upload, specs, and vendor details</td></tr>
+      <tr><td>Detail View</td><td><code>CustomProductById.jsx</code></td><td>Single custom product detail page</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Form Fields</h3>
+  <div class="card">
+    <ul>
+      <li><strong>Basic Info</strong> &mdash; Product Name, Product Code (SKU), Category, Sub-Category</li>
+      <li><strong>Specifications</strong> &mdash; Brand, Color, Finish, Material, Size, Thickness (same fields as catalog products for consistency)</li>
+      <li><strong>Pricing</strong> &mdash; Price and Unit (e.g., per sqft, per piece)</li>
+      <li><strong>Images</strong> &mdash; Upload product images via <code>POST /customProducts/upload</code></li>
+      <li><strong>Vendor Details</strong> &mdash; Brand Name, Vendor Name, Mobile Number, Pincode, City, Address</li>
+    </ul>
+  </div>
+</section>
+
+<section id="fe-compare">
+  <h2>Compare</h2>
+  <p>The compare feature lets designers place up to 4 products side by side to evaluate specifications and make informed material selections.</p>
+
+  <h3>How it Works</h3>
+  <div class="card">
+    <div class="journey-step">
+      <div class="journey-num">1</div>
+      <div class="journey-content">
+        <strong>Add to Compare</strong>
+        <p>On product card hover, a "Compare" button appears. Clicking it adds the product to the compare tray. All compared products must be from the same category/sub-category. Maximum 4 products.</p>
+      </div>
+    </div>
+    <div class="journey-step">
+      <div class="journey-num">2</div>
+      <div class="journey-content">
+        <strong>Compare Tray</strong>
+        <p>A sticky bottom bar (<code>CompareTray</code>) appears when products are added. Shows thumbnails and a "Compare Now" button that navigates to <code>/compare-products</code>.</p>
+      </div>
+    </div>
+    <div class="journey-step">
+      <div class="journey-num">3</div>
+      <div class="journey-content">
+        <strong>Comparison Table</strong>
+        <p><code>ComparePage</code> dynamically generates a comparison table by extracting all unique specification keys from the selected products. Important fields (Price, Brand, Color) are prioritized at the top. Users can add products to projects directly from this view.</p>
+      </div>
+    </div>
+  </div>
+  <div class="note"><strong>Client-side only:</strong> The compare feature is entirely managed in Redux (<code>compareSlice.js</code>) with no API calls. The compare list is lost on page refresh.</div>
+</section>
+
+<section id="fe-wishlist">
+  <h2>Wishlist</h2>
+  <p>A personal favorites list where designers save products they're interested in for later review.</p>
+
+  <div class="card">
+    <ul>
+      <li><strong>Toggle Button</strong> &mdash; Heart icon on every <code>ProductCard</code> and on the <code>ProductByID</code> page. Uses optimistic UI updates for instant feedback.</li>
+      <li><strong>Login Required</strong> &mdash; Clicking the wishlist button when not logged in redirects to <code>/login</code>.</li>
+      <li><strong>Wishlist Page</strong> &mdash; Accessible via the Navbar. Shows all saved products in a grid with full <code>ProductCard</code> components.</li>
+      <li><strong>Protected Route</strong> &mdash; The <code>/wishlist</code> page requires authentication.</li>
+    </ul>
+  </div>
+</section>
+
+<section id="fe-moodboard">
+  <h2>Moodboard</h2>
+  <p>A drag-and-drop visual canvas editor where designers create material presentation boards. Accessed at <code>/mood-board/:mood_board_id?</code>.</p>
+  <p>Files: <code>src/components/MoodboardComponent/</code></p>
+
+  <div class="card">
+    <ul>
+      <li><strong>Canvas</strong> &mdash; The main drawing area where products and images can be placed</li>
+      <li><strong>Draggable Items</strong> &mdash; Products from projects can be dragged onto the canvas and positioned freely using <code>react-dnd</code></li>
+      <li><strong>Image Library</strong> &mdash; Browse and add images from the product catalog</li>
+      <li><strong>Canvas Settings</strong> &mdash; Background color picker (using <code>react-colorful</code>), resizable canvas (<code>re-resizable</code>)</li>
+      <li><strong>Export</strong> &mdash; Save the moodboard to the project via <code>POST /customer/projects/:projectId/moodboard</code>. Can also export as image using <code>html-to-image</code> and <code>jspdf</code>.</li>
+    </ul>
+  </div>
+</section>
+
+<section id="fe-notifications">
+  <h2>Notifications</h2>
+  <p>In-app notification system that delivers admin announcements and updates to designers.</p>
+
+  <h3>Components</h3>
+  <div class="rel-grid">
+    <div class="rel-card">
+      <h4>NotificationBell</h4>
+      <p>Located in the App Navbar. Shows a red badge with the unread count. Fetches count from <code>GET /customer/notifications/unread-count</code>.</p>
+    </div>
+    <div class="rel-card">
+      <h4>NotificationPopup</h4>
+      <p>Dropdown panel that appears when clicking the bell. Shows recent notifications with read/unread indicators. Clicking a notification marks it as read and, if it contains a link, tracks the click.</p>
+    </div>
+  </div>
+
+  <h3>Notification Page</h3>
+  <p>File: <code>src/pages/Notification/Notification.jsx</code></p>
+  <p>Full-page notification list at <code>/notification</code>. Fetches all notifications from <code>GET /customer/notifications</code> and displays them with timestamps, read status, and clickable links.</p>
+</section>
+
+<!-- ==================== DEEP DIVES ==================== -->
+
+<section id="fe-rbac">
+  <h2>RBAC System</h2>
+  <p>The frontend implements Role-Based Access Control through utility functions in <code>src/utils/rbacUtils.js</code>. These functions determine what actions a user can perform on projects based on their user type and assigned permissions.</p>
+
+  <h3>Permission Levels</h3>
+  <table>
+    <thead><tr><th>Level</th><th>Can View</th><th>Can Edit Content</th><th>Can Edit Metadata</th><th>Can Delete/Archive</th></tr></thead>
+    <tbody>
+      <tr><td><strong>owner</strong></td><td>Yes</td><td>Yes</td><td>Yes</td><td>Yes</td></tr>
+      <tr><td><strong>can edit</strong></td><td>Yes</td><td>Yes</td><td>No</td><td>No</td></tr>
+      <tr><td><strong>can view</strong></td><td>Yes</td><td>No</td><td>No</td><td>No</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Permission Resolution</h3>
+  <div class="card">
+    <ul>
+      <li><strong>Company admins</strong> &mdash; Always get "owner" permission on all projects</li>
+      <li><strong>Individual users</strong> &mdash; Get "owner" on projects they created</li>
+      <li><strong>Company members</strong> &mdash; Permission is looked up from the project's <code>permission</code> array, matching by user ID or email. Only see projects where they have explicit access.</li>
+    </ul>
+  </div>
+
+  <h3>Available Checks</h3>
+  <table>
+    <thead><tr><th>Function</th><th>Returns</th><th>Used For</th></tr></thead>
+    <tbody>
+      <tr><td><code>getUserProjectPermission(project, user)</code></td><td>"owner" | "can edit" | "can view" | null</td><td>Core permission resolver</td></tr>
+      <tr><td><code>isProjectOwner(project, user)</code></td><td>Boolean</td><td>Show/hide admin actions</td></tr>
+      <tr><td><code>canViewProject(project, user)</code></td><td>Boolean</td><td>Filter visible projects</td></tr>
+      <tr><td><code>canEditProject(project, user)</code></td><td>Boolean</td><td>Show/hide edit buttons</td></tr>
+      <tr><td><code>canDeleteProject(project, user)</code></td><td>Boolean</td><td>Show/hide delete option</td></tr>
+      <tr><td><code>canArchiveProject(project, user)</code></td><td>Boolean</td><td>Show/hide archive option</td></tr>
+      <tr><td><code>canDuplicateProject(project, user)</code></td><td>Boolean</td><td>Show/hide duplicate option</td></tr>
+      <tr><td><code>canEditProjectMetadata(project, user)</code></td><td>Boolean</td><td>Show/hide settings (name, client details)</td></tr>
+      <tr><td><code>canCreateProject(user)</code></td><td>Boolean</td><td>Show/hide "Create Project" button</td></tr>
+      <tr><td><code>filterProjectsByPermission(projects, user)</code></td><td>Array</td><td>Filter project list for company members</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="fe-styling">
+  <h2>Styling Architecture</h2>
+  <p>The application uses a hybrid styling approach combining Tailwind CSS utility classes with SCSS module stylesheets.</p>
+
+  <h3>Tailwind CSS</h3>
+  <div class="card">
+    <ul>
+      <li><strong>Configuration</strong> &mdash; <code>tailwind.config.js</code> with custom theme extensions</li>
+      <li><strong>Usage</strong> &mdash; Primarily used for layout, spacing, flexbox/grid, typography, and responsive utilities directly in JSX</li>
+      <li><strong>Plugins</strong> &mdash; <code>tailwindcss-animate</code> for animation utilities, <code>tailwind-scrollbar-hide</code> for hidden scrollbars</li>
+      <li><strong>Merge Utility</strong> &mdash; <code>tailwind-merge</code> via <code>cn()</code> helper in <code>src/lib/utils.ts</code> for conditional class merging</li>
+    </ul>
+  </div>
+
+  <h3>SCSS Structure</h3>
+  <pre>
+src/style/
+├── main.scss                   # Entry point (imports everything)
+├── utils/
+│   ├── _color.scss             # CSS custom properties (--color_1 through --color_d1)
+│   ├── _font.scss              # Font imports (Inter, Poppins, Lato, Onest, Bebas Neue, etc.)
+│   ├── _breakpoints.scss       # Responsive breakpoint mixins
+│   └── _utils.scss             # Shared mixins (f14, f16, etc. for font sizing)
+├── components/
+│   ├── _navbar.scss            # App navbar styles
+│   ├── _productNavigation.scss # Category bar + mega-menu dropdown
+│   ├── _footer.scss            # Footer styles
+│   └── _components.scss        # Shared component styles
+├── page/
+│   ├── _dashboard.scss         # Dashboard/Explore page
+│   ├── _projects.scss          # Projects page
+│   ├── _profile.scss           # Profile page wrapper
+│   ├── _customProducts.scss    # Custom products page
+│   ├── _landing.scss           # Landing page sections
+│   ├── _signup.scss            # Auth pages
+│   ├── _moodBoard.scss         # Moodboard canvas
+│   └── _product.scss           # Product detail page
+└── oldstyle/                   # Legacy styles (being phased out)</pre>
+
+  <h3>Key Design Tokens</h3>
+  <table>
+    <thead><tr><th>Token</th><th>Value</th><th>Usage</th></tr></thead>
+    <tbody>
+      <tr><td><code>--color_3</code></td><td>Primary brand color</td><td>Active states, links, category names</td></tr>
+      <tr><td><code>--color_4</code></td><td>Border/divider color</td><td>Subtle separators, filter borders</td></tr>
+      <tr><td><code>--white</code></td><td>#ffffff</td><td>Card backgrounds, text on dark</td></tr>
+      <tr><td><code>--black</code></td><td>#000000</td><td>Overlay backgrounds</td></tr>
+      <tr><td><code>--color_d1</code></td><td>Light border color</td><td>Card borders, dividers</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Responsive Breakpoints</h3>
+  <p>SCSS mixins handle responsive design. The <code>ProductNavigation</code> uses custom media queries, while most pages rely on Tailwind's responsive prefixes (<code>sm:</code>, <code>md:</code>, <code>lg:</code>). The landing navbar switches to a mobile hamburger menu at 600px.</p>
+</section>
+
+<section id="fe-reusable-components">
+  <h2>Reusable Components</h2>
+  <p>The <code>src/components/</code> directory contains shared UI components used across multiple pages.</p>
+
+  <table>
+    <thead><tr><th>Component</th><th>File</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td><code>Input</code></td><td><code>Inputs/Input.jsx</code></td><td>Styled text input with label, error state, and icon support</td></tr>
+      <tr><td><code>CustInput</code></td><td><code>Inputs/CustInput.jsx</code></td><td>Custom input variant with additional formatting options</td></tr>
+      <tr><td><code>Search</code></td><td><code>Inputs/Search.jsx</code></td><td>Search bar with icon and clear button</td></tr>
+      <tr><td><code>SpaceDropDown</code></td><td><code>Inputs/SpaceDropDown.jsx</code></td><td>Dropdown for selecting project spaces</td></tr>
+      <tr><td><code>Pagination</code></td><td><code>Pagination/Pagination.jsx</code></td><td>Page navigation with numbered pages, prev/next</td></tr>
+      <tr><td><code>Loader</code></td><td><code>Loader/Loader.jsx</code></td><td>Full-screen loading spinner with animated logo SVGs</td></tr>
+      <tr><td><code>PasswordRequirements</code></td><td><code>PasswordRequirements/PasswordRequirements.jsx</code></td><td>Real-time password strength indicator showing criteria status</td></tr>
+      <tr><td><code>Footer1</code></td><td><code>Footer/Footer1.jsx</code></td><td>Site footer with branding, social links, and legal pages</td></tr>
+      <tr><td><code>SectionHeader</code></td><td><code>Explore/SectionHeader.jsx</code></td><td>Standardized section heading for dashboard sections</td></tr>
+      <tr><td><code>TrialTimer</code></td><td><code>TrialTimer/TrialTimer.jsx</code></td><td>Countdown timer for trial period display</td></tr>
+      <tr><td><code>SvgCollection</code></td><td><code>assets/Image/SvgCollection.jsx</code></td><td>Centralized SVG icon components indexed by name (e.g., <code>walls&amp;floor</code>, <code>sanitary</code>)</td></tr>
+    </tbody>
+  </table>
+
+  <h3>UI Primitives (Radix-based)</h3>
+  <p>Located in <code>src/components/ui/</code>, these are accessible, unstyled primitives from Radix UI, styled with Tailwind:</p>
+  <div class="card">
+    <ul>
+      <li><strong>button.tsx</strong> &mdash; Button with variants (default, destructive, outline, secondary, ghost, link) and sizes</li>
+      <li><strong>slider.tsx</strong> &mdash; Range slider used for price filters</li>
+      <li><strong>sonner.jsx</strong> &mdash; Toast notification provider (wraps the Sonner library)</li>
+    </ul>
+  </div>
+
+  <h3>Custom Hooks</h3>
+  <table>
+    <thead><tr><th>Hook</th><th>File</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td><code>useQueryParams</code></td><td><code>customHooks/useQueryParams.js</code></td><td>Read/write URL query parameters. Used by filters and category navigation to persist state in the URL.</td></tr>
+      <tr><td><code>useWindowDimensions</code></td><td><code>hooks/useWindowLayout.js</code></td><td>Returns current window <code>width</code> and <code>height</code>. Used for responsive layout calculations (e.g., cards per row in carousels).</td></tr>
+      <tr><td><code>useGlobalLoader</code></td><td><code>customHooks/useGlobalLoader.js</code></td><td>Hook into the global loading overlay from the <code>appState</code> slice.</td></tr>
+      <tr><td><code>useSmartPosition</code></td><td><code>customHooks/useSmartPosition.js</code></td><td>Calculates position for hover cards to keep them within viewport boundaries.</td></tr>
+      <tr><td><code>useNavigationWithQuery</code></td><td><code>customHooks/useNavigationWithQuery.js</code></td><td>Navigate to a new route while preserving existing query parameters.</td></tr>
+      <tr><td><code>scrollTop</code></td><td><code>customHooks/scrollTop.js</code></td><td>Scroll-to-top utility for page transitions.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+  </div>
+
+  </main>
+  </div>
+
+  <script>
+  function _h(s){let h=0;for(let i=0;i<s.length;i++){h=((h<<5)-h)+s.charCodeAt(i);h|=0;}return h;}
+  function attemptLogin() {
+    const input = document.getElementById('loginPassword').value;
+    const hash = _h(input);
+    if (hash === 445234471 || hash === 1453554044 || hash === -2020462654) {
+      document.getElementById('loginOverlay').style.display = 'none';
+      document.getElementById('mainLayout').style.display = 'flex';
+      sessionStorage.setItem('mat_docs_auth', '1');
+    } else {
+      const err = document.getElementById('loginError');
+      err.style.display = 'block';
+      setTimeout(() => err.style.display = 'none', 3000);
+    }
+  }
+  document.getElementById('loginPassword').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') attemptLogin();
+  });
+  if (sessionStorage.getItem('mat_docs_auth') === '1') {
     document.getElementById('loginOverlay').style.display = 'none';
     document.getElementById('mainLayout').style.display = 'flex';
-    sessionStorage.setItem('mat_docs_auth', '1');
-  } else {
-    document.getElementById('loginError').style.display = 'block';
   }
-}
-document.getElementById('loginPassword').addEventListener('keydown', function(e) {
-  if (e.key === 'Enter') attemptLogin();
-});
-if (sessionStorage.getItem('mat_docs_auth') === '1') {
-  document.getElementById('loginOverlay').style.display = 'none';
-  document.getElementById('mainLayout').style.display = 'flex';
-}
 
-document.querySelectorAll('.sidebar nav a').forEach(link => {
-  link.addEventListener('click', () => {
-    document.querySelectorAll('.sidebar nav a').forEach(l => l.classList.remove('active'));
-    link.classList.add('active');
-    document.querySelector('.sidebar').classList.remove('open');
+  function switchTab(tab) {
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+
+    if (tab === 'backend') {
+      document.querySelector('.tab-btn:first-child').classList.add('active');
+      document.getElementById('content-backend').classList.add('active');
+      document.getElementById('nav-backend').style.display = '';
+      document.getElementById('nav-frontend').style.display = 'none';
+      document.getElementById('swagger-link-backend').style.display = '';
+    } else {
+      document.querySelector('.tab-btn:last-child').classList.add('active');
+      document.getElementById('content-frontend').classList.add('active');
+      document.getElementById('nav-backend').style.display = 'none';
+      document.getElementById('nav-frontend').style.display = '';
+      document.getElementById('swagger-link-backend').style.display = 'none';
+    }
+    window.scrollTo(0, 0);
+  }
+
+  window.addEventListener('scroll', () => {
+    const activeTab = document.querySelector('.tab-content.active');
+    if (!activeTab) return;
+    const sections = activeTab.querySelectorAll('section[id]');
+    const navId = activeTab.id === 'content-backend' ? 'nav-backend' : 'nav-frontend';
+    const navLinks = document.getElementById(navId).querySelectorAll('a');
+    let current = '';
+    sections.forEach(s => {
+      if (window.scrollY >= s.offsetTop - 100) current = s.id;
+    });
+    navLinks.forEach(a => {
+      a.classList.toggle('active', a.getAttribute('href') === '#' + current);
+    });
   });
-});
-window.addEventListener('scroll', () => {
-  const sections = document.querySelectorAll('section');
-  let current = '';
-  sections.forEach(s => {
-    if (window.scrollY >= s.offsetTop - 100) current = s.id;
+
+  document.querySelectorAll('.sidebar nav a').forEach(link => {
+    link.addEventListener('click', () => {
+      document.querySelector('.sidebar').classList.remove('open');
+    });
   });
-  document.querySelectorAll('.sidebar nav a').forEach(a => {
-    a.classList.toggle('active', a.getAttribute('href') === '#' + current);
-  });
-});
-</script>
-</body>
-</html>
+  </script>
+
+  </body>
+  </html>
