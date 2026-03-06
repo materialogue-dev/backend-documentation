@@ -1,0 +1,1415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Materialogue — Backend Documentation</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --accent: #c8e64c;
+  --accent-dark: #a8c23a;
+  --sidebar-bg: #1a1d23;
+  --sidebar-text: #b0b4bc;
+  --sidebar-active: #ffffff;
+  --bg: #f8f9fa;
+  --card-bg: #ffffff;
+  --text: #24262b;
+  --text-secondary: #5a5e66;
+  --border: #e2e5ea;
+  --code-bg: #f1f3f5;
+  --method-get: #61affe;
+  --method-post: #49cc90;
+  --method-put: #fca130;
+  --method-delete: #f93e3e;
+  --method-patch: #50e3c2;
+}
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: var(--text); background: var(--bg); line-height: 1.6; }
+.layout { display: flex; min-height: 100vh; }
+
+.login-overlay { position: fixed; inset: 0; background: var(--sidebar-bg); display: flex; align-items: center; justify-content: center; z-index: 9999; }
+.login-box { background: #22252c; border-radius: 16px; padding: 48px; max-width: 400px; width: 90%; text-align: center; border: 1px solid rgba(255,255,255,0.08); }
+.login-box h1 { color: var(--accent); font-size: 24px; margin-bottom: 6px; }
+.login-box p { color: var(--sidebar-text); font-size: 14px; margin-bottom: 28px; }
+.login-box input { width: 100%; padding: 12px 16px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.12); background: rgba(255,255,255,0.06); color: #fff; font-size: 15px; outline: none; margin-bottom: 12px; }
+.login-box input:focus { border-color: var(--accent); }
+.login-box button { width: 100%; padding: 12px; border-radius: 8px; border: none; background: var(--accent); color: var(--text); font-size: 15px; font-weight: 600; cursor: pointer; }
+.login-box button:hover { background: var(--accent-dark); }
+.login-error { color: #f93e3e; font-size: 13px; margin-top: 8px; display: none; }
+
+.sidebar { width: 280px; background: var(--sidebar-bg); color: var(--sidebar-text); position: fixed; top: 0; left: 0; bottom: 0; overflow-y: auto; z-index: 100; transition: transform 0.3s; }
+.sidebar-header { padding: 24px 20px; border-bottom: 1px solid rgba(255,255,255,0.08); }
+.sidebar-header h1 { color: var(--accent); font-size: 20px; font-weight: 700; letter-spacing: -0.5px; }
+.sidebar-header p { color: var(--sidebar-text); font-size: 12px; margin-top: 4px; }
+.sidebar nav { padding: 12px 0; }
+.sidebar nav a { display: block; padding: 8px 20px; color: var(--sidebar-text); text-decoration: none; font-size: 13px; transition: all 0.2s; border-left: 3px solid transparent; }
+.sidebar nav a:hover { color: var(--sidebar-active); background: rgba(255,255,255,0.04); }
+.sidebar nav a.active { color: var(--accent); border-left-color: var(--accent); background: rgba(200,230,76,0.06); }
+.sidebar nav .nav-group { padding: 16px 20px 6px; font-size: 10px; text-transform: uppercase; letter-spacing: 1.2px; color: rgba(255,255,255,0.3); font-weight: 600; }
+.sidebar .swagger-link { display: block; margin: 16px 20px; padding: 10px; text-align: center; background: var(--accent); color: var(--text); font-size: 13px; font-weight: 600; text-decoration: none; border-radius: 6px; }
+.sidebar .swagger-link:hover { background: var(--accent-dark); }
+.content { margin-left: 280px; flex: 1; padding: 40px 48px; max-width: 1000px; }
+.menu-toggle { display: none; position: fixed; top: 12px; left: 12px; z-index: 200; background: var(--sidebar-bg); color: var(--accent); border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 20px; }
+section { margin-bottom: 48px; scroll-margin-top: 20px; }
+h2 { font-size: 28px; font-weight: 700; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 2px solid var(--accent); color: var(--text); }
+h3 { font-size: 20px; font-weight: 600; margin: 24px 0 12px; color: var(--text); }
+h4 { font-size: 16px; font-weight: 600; margin: 16px 0 8px; color: var(--text); }
+p { margin-bottom: 12px; color: var(--text-secondary); }
+ul, ol { margin: 0 0 16px 24px; color: var(--text-secondary); }
+li { margin-bottom: 4px; }
+.card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 10px; padding: 24px; margin-bottom: 20px; }
+.badge { display: inline-block; padding: 3px 10px; border-radius: 4px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #fff; font-family: monospace; }
+.badge-get { background: var(--method-get); }
+.badge-post { background: var(--method-post); }
+.badge-put { background: var(--method-put); }
+.badge-delete { background: var(--method-delete); }
+.badge-patch { background: var(--method-patch); }
+.badge-auth { background: #6c5ce7; }
+code { background: var(--code-bg); padding: 2px 6px; border-radius: 4px; font-size: 13px; font-family: 'SF Mono', Monaco, monospace; }
+pre { background: var(--sidebar-bg); color: #e6e8eb; padding: 16px 20px; border-radius: 8px; overflow-x: auto; margin: 12px 0 20px; font-size: 13px; line-height: 1.5; }
+table { width: 100%; border-collapse: collapse; margin: 12px 0 20px; font-size: 14px; }
+th { background: var(--sidebar-bg); color: #fff; padding: 10px 14px; text-align: left; font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+th:first-child { border-radius: 6px 0 0 0; } th:last-child { border-radius: 0 6px 0 0; }
+td { padding: 10px 14px; border-bottom: 1px solid var(--border); }
+tr:hover td { background: rgba(200,230,76,0.04); }
+.ep { background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; margin-bottom: 12px; overflow: hidden; }
+.ep-header { display: flex; align-items: center; gap: 12px; padding: 12px 16px; }
+.ep-header .path { font-family: 'SF Mono', Monaco, monospace; font-size: 14px; font-weight: 500; }
+.ep-header .desc { color: var(--text-secondary); font-size: 13px; margin-left: auto; }
+.tech-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin: 16px 0; }
+.tech-item { background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; padding: 16px; text-align: center; }
+.tech-item strong { display: block; color: var(--text); margin-bottom: 4px; }
+.tech-item span { font-size: 13px; color: var(--text-secondary); }
+.note { background: #fffdf0; border: 1px solid #f0e6b0; border-left: 4px solid #e6c84c; border-radius: 6px; padding: 12px 16px; margin: 12px 0; font-size: 14px; color: var(--text-secondary); }
+.warn { background: #fff5f5; border: 1px solid #ffc9c9; border-left: 4px solid var(--method-delete); border-radius: 6px; padding: 12px 16px; margin: 12px 0; font-size: 14px; color: var(--text-secondary); }
+
+.flow-diagram { display: flex; align-items: center; justify-content: center; gap: 0; flex-wrap: wrap; margin: 24px 0; padding: 24px 0; }
+.flow-box { background: var(--card-bg); border: 2px solid var(--border); border-radius: 10px; padding: 14px 20px; text-align: center; min-width: 120px; }
+.flow-box strong { display: block; font-size: 14px; color: var(--text); }
+.flow-box span { font-size: 11px; color: var(--text-secondary); }
+.flow-box.highlight { border-color: var(--accent); background: rgba(200,230,76,0.08); }
+.flow-arrow { font-size: 22px; color: var(--accent-dark); padding: 0 6px; font-weight: bold; flex-shrink: 0; }
+
+.rel-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 20px 0; }
+.rel-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 10px; padding: 18px; }
+.rel-card h4 { margin: 0 0 8px; font-size: 15px; color: var(--text); }
+.rel-card p { margin: 0; font-size: 13px; color: var(--text-secondary); line-height: 1.5; }
+.rel-card .rel-arrow { color: var(--accent-dark); font-weight: 600; }
+
+.journey-step { display: flex; align-items: flex-start; gap: 16px; margin-bottom: 20px; }
+.journey-num { width: 36px; height: 36px; background: var(--accent); color: var(--text); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 15px; flex-shrink: 0; }
+.journey-content { flex: 1; }
+.journey-content strong { display: block; margin-bottom: 2px; color: var(--text); }
+.journey-content p { margin: 0; font-size: 14px; color: var(--text-secondary); }
+.journey-connector { width: 2px; height: 16px; background: var(--accent); margin: -12px 0 -12px 17px; }
+
+.env-table td:first-child { font-family: 'SF Mono', Monaco, monospace; font-size: 13px; white-space: nowrap; }
+
+@media (max-width: 768px) {
+  .sidebar { transform: translateX(-100%); }
+  .sidebar.open { transform: translateX(0); }
+  .content { margin-left: 0; padding: 20px 16px; padding-top: 60px; }
+  .menu-toggle { display: block; }
+  table { font-size: 12px; }
+  th, td { padding: 6px 8px; }
+  .flow-diagram { flex-direction: column; }
+  .flow-arrow { transform: rotate(90deg); }
+  .rel-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<div class="login-overlay" id="loginOverlay">
+  <div class="login-box">
+    <h1>Materialogue</h1>
+    <p>Backend Documentation — Password Required</p>
+    <input type="password" id="loginPassword" placeholder="Enter password" autocomplete="off">
+    <button onclick="attemptLogin()">Access Documentation</button>
+    <div class="login-error" id="loginError">Incorrect password. Please try again.</div>
+  </div>
+</div>
+
+<button class="menu-toggle" onclick="document.querySelector('.sidebar').classList.toggle('open')">&#9776;</button>
+<div class="layout" id="mainLayout" style="display:none;">
+<aside class="sidebar">
+  <div class="sidebar-header">
+    <h1>Materialogue</h1>
+    <p>Backend Documentation</p>
+  </div>
+  <nav>
+    <div class="nav-group">Getting Started</div>
+    <a href="#overview">What is Materialogue?</a>
+    <a href="#how-it-works">How the System Works</a>
+    <a href="#user-journey">User Journey</a>
+    <a href="#tech-stack">Tech Stack</a>
+    <a href="#project-structure">Project Structure</a>
+    <a href="#env-vars">Environment Variables</a>
+    <div class="nav-group">Data Models</div>
+    <a href="#model-relationships">How Models Connect</a>
+    <a href="#model-user">User</a>
+    <a href="#model-company">Company</a>
+    <a href="#model-product">Product</a>
+    <a href="#model-project">Project</a>
+    <a href="#model-brand">Brand</a>
+    <a href="#model-category">Category</a>
+    <a href="#model-custom-product">CustomProduct</a>
+    <a href="#model-temp-user">TempUser</a>
+    <a href="#model-otp">OTP</a>
+    <a href="#model-brand-contact">BrandContact</a>
+    <a href="#model-brand-api-key">BrandApiKey</a>
+    <a href="#model-notification">Notification</a>
+    <a href="#model-receipt">NotificationReceipt</a>
+    <div class="nav-group">Authentication</div>
+    <a href="#ep-auth">Auth Endpoints</a>
+    <div class="nav-group">Customer / Designer</div>
+    <a href="#ep-profile">Profile</a>
+    <a href="#ep-wishlist">Wishlist</a>
+    <a href="#ep-projects">Projects</a>
+    <a href="#ep-spaces">Spaces</a>
+    <a href="#ep-space-products">Space Products</a>
+    <a href="#ep-project-bank">Project Bank</a>
+    <a href="#ep-exports">Exports</a>
+    <a href="#ep-export-templates">Export Templates</a>
+    <a href="#ep-customer-notifs">Designer Notifications</a>
+    <div class="nav-group">Products</div>
+    <a href="#ep-products">Product Endpoints</a>
+    <a href="#ep-custom-products">Custom Products</a>
+    <a href="#ep-categories">Categories</a>
+    <div class="nav-group">Admin</div>
+    <a href="#ep-admin-users">Users</a>
+    <a href="#ep-admin-products">Products</a>
+    <a href="#ep-admin-brands">Brands</a>
+    <a href="#ep-admin-uploads">Uploads</a>
+    <a href="#ep-admin-notifs">Notifications</a>
+    <div class="nav-group">Company</div>
+    <a href="#ep-company">Members</a>
+    <div class="nav-group">Brand System</div>
+    <a href="#ep-brands-public">Brand Pages</a>
+    <a href="#ep-brand-api">Brand Partner API</a>
+    <div class="nav-group">Deep Dives</div>
+    <a href="#cross-filtering">Cross-Filtering</a>
+    <a href="#export-system">Export System</a>
+    <a href="#notification-system">Notification System</a>
+    <a href="#pdf-proxy">PDF Proxy</a>
+  </nav>
+  <a class="swagger-link" href="https://brand-guidelines.materialogue.com/" target="_blank">Brand Partner Swagger Docs &rarr;</a>
+</aside>
+
+<main class="content">
+
+<!-- ==================== GETTING STARTED ==================== -->
+
+<section id="overview">
+  <h2>What is Materialogue?</h2>
+  <p>Materialogue is a product catalog and project management platform built for architects and interior designers in India. It lets designers browse curated catalogs of building materials (tiles, sanitary ware, paints, fabrics, lights, and more), organize those materials into projects, and generate professional export documents to share with clients and vendors.</p>
+  <p>This backend API powers all of that — from user authentication, to the product catalog with smart filtering, to PDF and Excel generation for client-ready documents.</p>
+  <div class="card">
+    <h4>What this backend does</h4>
+    <ul>
+      <li><strong>Authentication</strong> — Email-based signup with OTP verification, JWT tokens for session management</li>
+      <li><strong>Product Catalog</strong> — 100+ fields per product, smart cross-filtering, category-based attribute system</li>
+      <li><strong>Project Management</strong> — Projects contain spaces (like "Master Bedroom"), each space holds selected products</li>
+      <li><strong>Export Generation</strong> — Professional Order Sheets, Selection Sheets (HTML and PDF), and Excel spreadsheets</li>
+      <li><strong>Team Collaboration</strong> — Company workspaces with admin/employee roles</li>
+      <li><strong>Brand System</strong> — Public brand pages, contact forms, and a Brand Partner API for brands to manage their own data</li>
+      <li><strong>Notifications</strong> — Admin-to-designer notifications with state-wise targeting, email delivery, and analytics</li>
+      <li><strong>Custom Products</strong> — Designers can add their own products when something isn't in the catalog</li>
+    </ul>
+  </div>
+</section>
+
+<section id="how-it-works">
+  <h2>How the System Works</h2>
+  <p>Every request to the backend follows this path — from the frontend app to the database and back:</p>
+
+  <div class="flow-diagram">
+    <div class="flow-box"><strong>Frontend App</strong><span>React / Mobile</span></div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-box highlight"><strong>Express.js</strong><span>app.js</span></div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-box"><strong>Routes</strong><span>URL mapping</span></div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-box"><strong>Middleware</strong><span>JWT / API Key</span></div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-box"><strong>Controllers</strong><span>Business logic</span></div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-box highlight"><strong>MongoDB</strong><span>Mongoose ODM</span></div>
+  </div>
+
+  <div class="card">
+    <h4>Layer by layer</h4>
+    <ul>
+      <li><strong>app.js</strong> — The entry point. Sets up Express, CORS middleware, and mounts all route groups at their base paths (e.g. <code>/auth</code>, <code>/customer</code>, <code>/admin</code>, <code>/products</code>).</li>
+      <li><strong>Routes</strong> — Map HTTP methods and URLs to controller functions. For example, <code>POST /auth/signup</code> maps to <code>authController.signup</code>.</li>
+      <li><strong>Middleware</strong> — Sits between routes and controllers. Two types: <code>verifyToken</code> (checks JWT for logged-in users) and <code>brandApiKey</code> (checks X-API-Key header for brand partners).</li>
+      <li><strong>Controllers</strong> — Where all the business logic lives. Each controller file handles one domain (auth, products, projects, exports, notifications, etc.).</li>
+      <li><strong>Models</strong> — Mongoose schemas that define the shape of data in MongoDB. They also handle validation (required fields, enums, max lengths).</li>
+      <li><strong>Utils</strong> — Shared utilities like the database connection, file upload helper (DigitalOcean Spaces), JWT verification, and Swagger specs.</li>
+    </ul>
+  </div>
+
+  <h3>How authentication works</h3>
+  <p>The API uses JWT (JSON Web Tokens) for authentication. When a user logs in, the server creates a signed token containing the user's email and ID. The frontend includes this token in the <code>Authorization</code> header of every subsequent request. The <code>verifyToken</code> middleware decodes the token and attaches the user info to the request.</p>
+  <p>For brand partners, authentication is simpler — they include their API key in the <code>X-API-Key</code> header, and the middleware looks up which brand the key belongs to.</p>
+</section>
+
+<section id="user-journey">
+  <h2>User Journey</h2>
+  <p>Here's how a typical designer uses the platform, and which parts of the backend power each step:</p>
+
+  <div class="journey-step">
+    <div class="journey-num">1</div>
+    <div class="journey-content">
+      <strong>Sign Up &amp; Verify</strong>
+      <p>Designer submits their name, email, and password. The backend creates a temporary user record and sends a 6-digit OTP to their email. Once verified, the temporary record becomes a permanent User and a Company workspace is automatically created.</p>
+      <p><code>POST /auth/signup</code> &rarr; <code>POST /auth/verify</code></p>
+    </div>
+  </div>
+  <div class="journey-connector"></div>
+  <div class="journey-step">
+    <div class="journey-num">2</div>
+    <div class="journey-content">
+      <strong>Browse the Catalog</strong>
+      <p>The designer explores products by category (Tiles, Sanitary, Paints, Fabrics, etc.). They can filter by brand, color, finish, size, price range, and more. The cross-filtering system dynamically narrows available options based on current selections — if they pick "Kohler" as a brand, colors update to show only Kohler's available colors.</p>
+      <p><code>POST /products/withFilters</code></p>
+    </div>
+  </div>
+  <div class="journey-connector"></div>
+  <div class="journey-step">
+    <div class="journey-num">3</div>
+    <div class="journey-content">
+      <strong>Save to Wishlist</strong>
+      <p>Products they like can be saved to a personal wishlist for quick access later.</p>
+      <p><code>POST /customer/wishlist/add/:productId</code></p>
+    </div>
+  </div>
+  <div class="journey-connector"></div>
+  <div class="journey-step">
+    <div class="journey-num">4</div>
+    <div class="journey-content">
+      <strong>Create a Project</strong>
+      <p>When starting work on a client's home or office, the designer creates a project with the client's details (name, address, contact info). Each project acts as a container for all the material selections for that site.</p>
+      <p><code>POST /customer/projects</code></p>
+    </div>
+  </div>
+  <div class="journey-connector"></div>
+  <div class="journey-step">
+    <div class="journey-num">5</div>
+    <div class="journey-content">
+      <strong>Organize into Spaces</strong>
+      <p>Inside a project, the designer creates spaces — like "Master Bedroom", "Kitchen", "Bathroom 1", "Living Room". Each space represents a physical area in the project.</p>
+      <p><code>POST /customer/projects/:projectId/spaces</code></p>
+    </div>
+  </div>
+  <div class="journey-connector"></div>
+  <div class="journey-step">
+    <div class="journey-num">6</div>
+    <div class="journey-content">
+      <strong>Add Products to Spaces</strong>
+      <p>The designer assigns products from the catalog to each space — tiles for the bathroom floor, sanitary ware for the basin area, paint for the bedroom walls. They set quantities and track everything in one place.</p>
+      <p><code>POST /customer/projects/:projectId/spaces/:spaceId/products</code></p>
+    </div>
+  </div>
+  <div class="journey-connector"></div>
+  <div class="journey-step">
+    <div class="journey-num">7</div>
+    <div class="journey-content">
+      <strong>Generate Exports</strong>
+      <p>When ready to share with the client or place orders, the designer generates professional documents: a <strong>Selection Sheet</strong> (visual product cards for client approval), an <strong>Order Sheet</strong> (tabular format for vendors), or an <strong>Excel spreadsheet</strong> (for detailed pricing). These can be customized with theme colors.</p>
+      <p><code>GET /.../exports/:exportId/selection-sheet/pdf</code></p>
+    </div>
+  </div>
+</section>
+
+<section id="tech-stack">
+  <h2>Tech Stack</h2>
+  <div class="tech-grid">
+    <div class="tech-item"><strong>Node.js 20</strong><span>Runtime</span></div>
+    <div class="tech-item"><strong>Express.js</strong><span>Web Framework</span></div>
+    <div class="tech-item"><strong>MongoDB</strong><span>Database (Mongoose)</span></div>
+    <div class="tech-item"><strong>DigitalOcean Spaces</strong><span>S3 File Storage</span></div>
+    <div class="tech-item"><strong>Puppeteer</strong><span>PDF Generation</span></div>
+    <div class="tech-item"><strong>ExcelJS</strong><span>Excel Export</span></div>
+    <div class="tech-item"><strong>Swagger UI</strong><span>API Documentation</span></div>
+    <div class="tech-item"><strong>JWT + OTP</strong><span>Authentication</span></div>
+  </div>
+  <p>The server runs on port <code>5000</code> bound to <code>0.0.0.0</code>. CORS is fully open (<code>*</code>) via manual middleware in app.js — no cors package is used. MongoDB is hosted externally on DigitalOcean Managed Databases.</p>
+</section>
+
+<section id="project-structure">
+  <h2>Project Structure</h2>
+  <p>The codebase follows a straightforward MVC-like pattern. Each domain (auth, products, projects, etc.) has its own route file, controller, and model.</p>
+  <pre>
+materialogue-backend/
+├── app.js                         # Entry point — Express setup, middleware, route mounting
+│
+├── controllers/                   # Business logic (one file per domain)
+│   ├── authentication.js          # Signup, login, OTP, password reset
+│   ├── customer.js                # Profile management, document uploads
+│   ├── product.js                 # Product CRUD + search with cross-filtering
+│   ├── project.js                 # Projects, spaces, space products, exports CRUD
+│   ├── exportTemplates.js         # HTML/PDF/Excel export generation
+│   ├── admin.js                   # Admin CRUD (users, products, brands, uploads)
+│   ├── notification.js            # Notification system (admin + designer side)
+│   ├── wishlist.js                # Wishlist add/remove
+│   ├── company.js                 # Company member management + welcome emails
+│   ├── brand.js                   # Public brand pages + contact forms
+│   ├── brandApi.js                # Brand Partner API (key-scoped operations)
+│   ├── customProducts.js          # Custom product CRUD
+│   ├── category.js                # Category tree
+│   └── imagesUploadAndDownload.js # Bulk image processing utilities
+│
+├── models/                        # Mongoose schemas (data shape + validation)
+│   ├── User.js                    # Designer/admin accounts
+│   ├── Company.js                 # Company/workspace
+│   ├── Product.js                 # Catalog products (100+ fields)
+│   ├── CustomProduct.js           # User-created products
+│   ├── Project.js                 # Projects with spaces + exports (embedded)
+│   ├── Brand.js                   # Brand profiles + API keys
+│   ├── BrandApiKey.js             # Brand API keys (legacy)
+│   ├── BrandContact.js            # Brand contact form submissions
+│   ├── Category.js                # 3-level category taxonomy
+│   ├── Notification.js            # Admin notifications
+│   ├── NotificationReceipt.js     # Per-user delivery tracking
+│   ├── TempUser.js                # Temporary signup records (pre-OTP)
+│   └── Otp.js                     # OTP codes (auto-expire in 5 min)
+│
+├── routes/                        # Express route definitions
+│   ├── authentication.js          # /auth
+│   ├── customer.js                # /customer (profile, projects, exports)
+│   ├── products.js                # /products
+│   ├── admin.js                   # /admin
+│   ├── notification.js            # /admin/notifications
+│   ├── customerNotification.js    # /customer/notifications
+│   ├── company.js                 # /company
+│   ├── brand.js                   # /brands
+│   ├── brandApi.js                # /brand-api
+│   ├── category.js                # /category
+│   └── customProducts.js          # /customProducts
+│
+├── middleware/
+│   └── brandApiKey.js             # X-API-Key header validation for brand partners
+│
+├── utils/
+│   ├── connection.js              # MongoDB connection setup
+│   ├── verify.js                  # JWT verification middleware
+│   ├── file.js                    # DigitalOcean Spaces file upload helper
+│   ├── pdfGenerator.js            # Puppeteer singleton browser management
+│   ├── swagger.js                 # Main API Swagger spec
+│   ├── brandApiSwagger.js         # Brand Partner API Swagger spec
+│   └── documentation.js           # API documentation HTML generator
+│
+├── scripts/                       # One-off migration and utility scripts
+│   └── migrateBrandIds.js         # Populate brandId on existing products
+│
+├── documentation/                 # Static documentation files
+│   └── backend-docs.html          # This file
+│
+└── guidelines.html                # Brand partner guide page</pre>
+</section>
+
+<section id="env-vars">
+  <h2>Environment Variables</h2>
+  <p>The backend uses these environment variables. Some have defaults, others must be set for the app to work correctly.</p>
+  <table class="env-table">
+    <thead><tr><th>Variable</th><th>Required</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td>PORT</td><td>No</td><td>Server port. Defaults to <code>5000</code>.</td></tr>
+      <tr><td>DO_ACCESS_KEY_ID</td><td>Yes</td><td>DigitalOcean Spaces access key for file uploads (product images, documents).</td></tr>
+      <tr><td>DO_SECRET_ACCESS_KEY</td><td>Yes</td><td>DigitalOcean Spaces secret key.</td></tr>
+      <tr><td>DO_BUCKET_NAME</td><td>No</td><td>Spaces bucket name. Defaults to <code>materialogue</code>.</td></tr>
+      <tr><td>DO_ENDPOINT</td><td>No</td><td>Spaces endpoint URL. Defaults to <code>https://blr1.digitaloceanspaces.com</code>.</td></tr>
+      <tr><td>EMAIL_WEBHOOK_URL</td><td>Yes</td><td>Webhook URL for sending emails (welcome emails, notification emails). Receives <code>{ to, subject, htmlBody }</code>.</td></tr>
+      <tr><td>PDF_PROXY_URL</td><td>No</td><td>Fallback URL for PDF generation when local Chrome is unavailable. Defaults to <code>https://materialogue-backend.replit.app</code>.</td></tr>
+      <tr><td>REPLIT_DOMAINS</td><td>No</td><td>Auto-set by Replit. Used to construct URLs for export template rendering.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ==================== DATA MODELS ==================== -->
+
+<section id="model-relationships">
+  <h2>How Models Connect</h2>
+  <p>The data model is centered around Users, Projects, and Products. Here's how everything relates:</p>
+
+  <div class="rel-grid">
+    <div class="rel-card">
+      <h4>User <span class="rel-arrow">&harr;</span> Company</h4>
+      <p>Every user belongs to a Company (workspace). When a user signs up, a Company is automatically created for them. Additional team members are added as Users with <code>company</code> pointing to the same Company. The Company <code>admin</code> field points back to the admin User.</p>
+    </div>
+    <div class="rel-card">
+      <h4>User <span class="rel-arrow">&rarr;</span> Project <span class="rel-arrow">&rarr;</span> Space <span class="rel-arrow">&rarr;</span> Product</h4>
+      <p>A User creates Projects. Each Project contains Spaces (embedded subdocuments). Each Space contains Products (also embedded). Products reference the catalog Product model by ID, plus store quantity, unit overrides, and custom notes.</p>
+    </div>
+    <div class="rel-card">
+      <h4>Project <span class="rel-arrow">&rarr;</span> Export</h4>
+      <p>Exports are embedded inside Projects. Each Export records which products to include and stores URLs for the generated PDF and Excel files. The export templates pull live product data when rendering.</p>
+    </div>
+    <div class="rel-card">
+      <h4>Product <span class="rel-arrow">&harr;</span> Brand</h4>
+      <p>Each Product has a <code>brand</code> (string, for display) and a <code>brandId</code> (ObjectId reference to Brand). When products are created or updated, brandId is auto-populated by matching the brand name against the Brand collection.</p>
+    </div>
+    <div class="rel-card">
+      <h4>User <span class="rel-arrow">&rarr;</span> Wishlist <span class="rel-arrow">&rarr;</span> Product</h4>
+      <p>The User model has a <code>wishlist</code> array of Product ObjectIds. Adding/removing from the wishlist updates this array directly on the User document.</p>
+    </div>
+    <div class="rel-card">
+      <h4>Notification <span class="rel-arrow">&rarr;</span> NotificationReceipt <span class="rel-arrow">&rarr;</span> User</h4>
+      <p>When an admin sends a Notification, a NotificationReceipt is created for each recipient User. Receipts track delivery, read, and click timestamps. Analytics are computed live from receipts.</p>
+    </div>
+    <div class="rel-card">
+      <h4>Brand <span class="rel-arrow">&rarr;</span> BrandContact</h4>
+      <p>When someone submits a contact form on a brand's page, a BrandContact document is created linking the submission to the Brand.</p>
+    </div>
+    <div class="rel-card">
+      <h4>TempUser <span class="rel-arrow">&rarr;</span> OTP <span class="rel-arrow">&rarr;</span> User</h4>
+      <p>During signup, a TempUser and an OTP are created together. Once the OTP is verified, the TempUser is promoted to a permanent User, and both temporary records are deleted.</p>
+    </div>
+  </div>
+</section>
+
+<section id="model-user">
+  <h2>User Model</h2>
+  <p>The User model represents every person who uses the platform — both designers (who browse and create projects) and admins (who manage the product catalog). When a user signs up, they're created with <code>is_approved: false</code> and must be approved by an admin before getting full access.</p>
+  <p>File: <code>models/User.js</code></p>
+  <table>
+    <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td><code>first_name</code></td><td>String (required)</td><td>First name</td></tr>
+      <tr><td><code>last_name</code></td><td>String (required)</td><td>Last name</td></tr>
+      <tr><td><code>email</code></td><td>String (required, unique)</td><td>Login email</td></tr>
+      <tr><td><code>password</code></td><td>String (required)</td><td>Hashed password</td></tr>
+      <tr><td><code>phone_number</code></td><td>String</td><td>Contact number</td></tr>
+      <tr><td><code>type</code></td><td>String (required)</td><td>"Individual", "Company", or "Company Member"</td></tr>
+      <tr><td><code>role</code></td><td>String</td><td>"admin" or "employee" (default: "employee")</td></tr>
+      <tr><td><code>is_approved</code></td><td>Boolean</td><td>Account approval status (default: false)</td></tr>
+      <tr><td><code>company</code></td><td>ObjectId &rarr; Company</td><td>Associated company/workspace</td></tr>
+      <tr><td><code>address.registered</code></td><td>Object</td><td><code>{ address1, address2, city, state, pincode }</code></td></tr>
+      <tr><td><code>address.shipping</code></td><td>Object</td><td><code>{ address1, address2, city, state, pincode }</code></td></tr>
+      <tr><td><code>wishlist</code></td><td>[ObjectId &rarr; Product]</td><td>Array of saved products</td></tr>
+      <tr><td><code>business_name</code></td><td>String</td><td>Business/firm name</td></tr>
+      <tr><td><code>website_url</code></td><td>String</td><td>Website URL</td></tr>
+      <tr><td><code>photo</code></td><td>String</td><td>Profile photo URL</td></tr>
+    </tbody>
+  </table>
+  <div class="note"><strong>Approval flow:</strong> New users get a 5-minute JWT until approved. Once an admin approves them via <code>PATCH /admin/users/:id/approve</code>, they receive full-duration tokens.</div>
+</section>
+
+<section id="model-company">
+  <h2>Company Model</h2>
+  <p>A Company is essentially a workspace that groups users together. Every user gets one automatically when they sign up — even individual designers. For firms, the Company lets multiple team members collaborate on the same projects.</p>
+  <p>File: <code>models/Company.js</code></p>
+  <table>
+    <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td><code>name</code></td><td>String (required)</td><td>Company/workspace name (uses business name or user's full name)</td></tr>
+      <tr><td><code>admin</code></td><td>ObjectId &rarr; User</td><td>The user who owns this workspace</td></tr>
+    </tbody>
+  </table>
+  <div class="note"><strong>No members array:</strong> Members are queried via <code>User.find({ company: companyId })</code> — the Company model itself doesn't store a list of members.</div>
+</section>
+
+<section id="model-product">
+  <h2>Product Model</h2>
+  <p>The Product model is the most complex schema in the system, with 100+ fields covering every type of building material — from tiles and marble to sanitary ware, paints, fabrics, and lights. Most fields are optional since different product categories use different attributes (a tile has "size" and "finish", while a faucet has "cock_type" and "water_saving").</p>
+  <p>File: <code>models/Product.js</code></p>
+  <h4>Key Fields</h4>
+  <table>
+    <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td><code>product_name</code></td><td>String (required)</td><td>Display name shown in the catalog</td></tr>
+      <tr><td><code>product_code</code></td><td>String</td><td>Internal SKU / model number</td></tr>
+      <tr><td><code>primary_sku</code></td><td>String</td><td>Links variants together — all color/size variants of the same product share this value</td></tr>
+      <tr><td><code>sku_variation</code></td><td>String</td><td>What makes this variant unique (e.g. "Black", "1198x1198-Matt")</td></tr>
+      <tr><td><code>total_variants</code></td><td>Number</td><td>Total number of variants in this product group</td></tr>
+      <tr><td><code>brand</code></td><td>String</td><td>Brand name as text (kept for backward compatibility)</td></tr>
+      <tr><td><code>brandId</code></td><td>ObjectId &rarr; Brand</td><td>Brand reference (auto-populated when product is created/updated)</td></tr>
+      <tr><td><code>category</code></td><td>String</td><td>Top-level category (e.g. "Sanitary", "Walls & Floor")</td></tr>
+      <tr><td><code>primary_sub_category</code></td><td>String</td><td>Primary subcategory (e.g. "Tile", "Basin Area")</td></tr>
+      <tr><td><code>secondary_sub_category</code></td><td>String</td><td>Secondary subcategory (e.g. "Wall Mounted Basin")</td></tr>
+      <tr><td><code>price1</code> / <code>unit1</code></td><td>Number / String</td><td>Primary price and unit (e.g. 850 / "/sqft")</td></tr>
+      <tr><td><code>images</code></td><td>[String]</td><td>Array of product image URLs (stored on DigitalOcean Spaces)</td></tr>
+      <tr><td><code>color</code>, <code>finish</code>, <code>material</code>, <code>size</code>, <code>thickness</code></td><td>String</td><td>Common specification fields used across categories</td></tr>
+      <tr><td><code>collection</code></td><td>String</td><td>Product collection or range name</td></tr>
+      <tr><td><code>is_archived</code></td><td>Boolean</td><td>When true, product is hidden from the catalog but not deleted</td></tr>
+    </tbody>
+  </table>
+  <div class="note"><strong>Variant grouping:</strong> Products with the same <code>primary_sku</code> are treated as variants of one product. When a user views a product, the API returns its siblings (other variants) so the user can switch between colors/sizes.</div>
+</section>
+
+<section id="model-project">
+  <h2>Project Model</h2>
+  <p>A Project is the central organizing unit for designers. It represents a real-world site (a home, office, or commercial space) and contains everything related to that project — the spaces, the product selections, and the generated exports.</p>
+  <p>File: <code>models/Project.js</code></p>
+  <table>
+    <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td><code>name</code></td><td>String (required)</td><td>Project name (e.g. "Sharma Residence")</td></tr>
+      <tr><td><code>userId</code></td><td>ObjectId &rarr; User</td><td>The designer who created this project</td></tr>
+      <tr><td><code>status</code></td><td>String</td><td>"active", "archived", or "deleted"</td></tr>
+      <tr><td><code>basic_details</code></td><td>Object</td><td>City, address, area, unit</td></tr>
+      <tr><td><code>client_details</code></td><td>Object</td><td>Client name, mobile, email, GST/PAN, POC</td></tr>
+      <tr><td><code>spaces</code></td><td>[Space]</td><td>Embedded subdocuments — each space has a name and a products array</td></tr>
+      <tr><td><code>exports</code></td><td>[Export]</td><td>Embedded subdocuments — each export has section, products, and PDF/Excel URLs</td></tr>
+      <tr><td><code>projectBank</code></td><td>[ObjectId &rarr; Product]</td><td>A "holding area" for products the designer is considering but hasn't assigned to a space yet</td></tr>
+    </tbody>
+  </table>
+  <div class="card">
+    <h4>Project Status Lifecycle</h4>
+    <p>Projects move through three states and can never go backward:</p>
+    <div class="flow-diagram">
+      <div class="flow-box highlight"><strong>active</strong><span>Normal use</span></div>
+      <div class="flow-arrow">&rarr;</div>
+      <div class="flow-box"><strong>archived</strong><span>via DELETE endpoint</span></div>
+      <div class="flow-arrow">&rarr;</div>
+      <div class="flow-box"><strong>deleted</strong><span>via soft-delete</span></div>
+    </div>
+    <p>Archived projects can be restored. Soft-deleted projects are hidden from all listings and direct fetches but remain in the database for data preservation.</p>
+  </div>
+</section>
+
+<section id="model-brand">
+  <h2>Brand Model</h2>
+  <p>The Brand model stores everything about a building material brand — its profile, collections, dealer network, and contact info. Brands are displayed on public brand pages where users can explore a brand's products and submit contact/enquiry forms.</p>
+  <p>File: <code>models/Brand.js</code></p>
+  <table>
+    <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td><code>name</code></td><td>String (required, unique)</td><td>Brand name (e.g. "Kohler", "Simpolo")</td></tr>
+      <tr><td><code>logo_url</code></td><td>String</td><td>Logo image URL</td></tr>
+      <tr><td><code>description</code></td><td>String</td><td>Brand description/about text</td></tr>
+      <tr><td><code>hero_images</code></td><td>[String]</td><td>Banner images for the brand page</td></tr>
+      <tr><td><code>collections</code></td><td>[Object]</td><td>Product collections/ranges with names and images</td></tr>
+      <tr><td><code>channel_partners</code></td><td>[Object]</td><td>Dealer and partner information by city</td></tr>
+      <tr><td><code>contact</code></td><td>Object</td><td>Contact details (email, phone, website)</td></tr>
+      <tr><td><code>api_key</code></td><td>String (select: false)</td><td>Brand Partner API key — hidden by default in queries, only shown via admin endpoint</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="model-category">
+  <h2>Category Model</h2>
+  <p>Categories define the taxonomy used to organize the product catalog. The system uses a three-level hierarchy that matches how building materials are naturally classified.</p>
+  <p>File: <code>models/Category.js</code></p>
+  <p>Structure: <strong>Category</strong> &rarr; <strong>SubCategory</strong> &rarr; <strong>SubSubCategory</strong></p>
+  <p>Examples:</p>
+  <ul>
+    <li>Walls & Floor &rarr; Tile &rarr; Floor Tile, Wall Tile</li>
+    <li>Sanitary &rarr; Basin Area &rarr; Wall Mounted Basin, Counter Top Basin</li>
+    <li>Fabrics &rarr; Curtain &rarr; Blackout, Sheer</li>
+  </ul>
+  <p>Each level has a <code>hasProducts</code> boolean flag indicating whether actual products exist at that level.</p>
+</section>
+
+<section id="model-custom-product">
+  <h2>CustomProduct Model</h2>
+  <p>When a designer sources a material that isn't in the Materialogue catalog — perhaps from a local vendor or a specialty manufacturer — they can create a Custom Product. These work just like catalog products in projects and exports, but they're only visible to the user who created them.</p>
+  <p>File: <code>models/CustomProduct.js</code></p>
+  <table>
+    <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td><code>product_name</code></td><td>String (required)</td><td>Display name</td></tr>
+      <tr><td><code>category</code></td><td>String (required)</td><td>Top-level category</td></tr>
+      <tr><td><code>primary_sub_category</code></td><td>String</td><td>Primary subcategory</td></tr>
+      <tr><td><code>brand</code> / <code>brandId</code></td><td>String / ObjectId</td><td>Brand name and reference</td></tr>
+      <tr><td><code>product_code</code></td><td>String</td><td>SKU / model number</td></tr>
+      <tr><td><code>price1</code> / <code>unit1</code></td><td>Number / String</td><td>Price and unit</td></tr>
+      <tr><td><code>images</code></td><td>[String]</td><td>Image URLs</td></tr>
+      <tr><td><code>added_by</code></td><td>String</td><td>User ID of creator</td></tr>
+      <tr><td><code>vendor_details</code></td><td>Object</td><td>Vendor info: brand_name, vendor_name, mobile_number, pincode, city, address</td></tr>
+    </tbody>
+  </table>
+  <div class="note">Uses the same attribute fields as Product (color, finish, material, size, thickness, etc.) so custom products appear consistently in exports.</div>
+</section>
+
+<section id="model-temp-user">
+  <h2>TempUser Model</h2>
+  <p>A temporary holding record created during signup, before the user verifies their email. Once OTP verification succeeds, the TempUser data is moved to the permanent User collection and the TempUser record is deleted.</p>
+  <p>File: <code>models/TempUser.js</code></p>
+  <table>
+    <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td><code>first_name</code>, <code>last_name</code></td><td>String</td><td>Name</td></tr>
+      <tr><td><code>email</code></td><td>String (unique)</td><td>Email address</td></tr>
+      <tr><td><code>type</code></td><td>String</td><td>User type (Individual, Company)</td></tr>
+      <tr><td><code>businessName</code></td><td>String</td><td>Business name</td></tr>
+      <tr><td><code>phoneNumber</code></td><td>String</td><td>Phone number</td></tr>
+      <tr><td><code>password</code></td><td>String</td><td>Hashed password</td></tr>
+      <tr><td><code>createdAt</code></td><td>Date</td><td>Record creation time</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="model-otp">
+  <h2>OTP Model</h2>
+  <p>Stores one-time passwords for email verification during signup and password reset. Each OTP auto-expires after 5 minutes thanks to a MongoDB TTL index on <code>createdAt</code>.</p>
+  <p>File: <code>models/Otp.js</code></p>
+  <table>
+    <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td><code>email</code></td><td>String (unique)</td><td>Target email address</td></tr>
+      <tr><td><code>otp</code></td><td>String</td><td>6-digit OTP code</td></tr>
+      <tr><td><code>attempts</code></td><td>Number</td><td>Number of verification attempts</td></tr>
+      <tr><td><code>createdAt</code></td><td>Date</td><td>TTL-indexed — document auto-deletes after 300 seconds</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="model-brand-contact">
+  <h2>BrandContact Model</h2>
+  <p>When a user submits a contact/enquiry form on a brand's public page, the submission is saved as a BrandContact document. This lets brands track incoming interest from designers.</p>
+  <p>File: <code>models/BrandContact.js</code></p>
+  <table>
+    <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td><code>brand</code></td><td>ObjectId &rarr; Brand</td><td>Which brand was contacted</td></tr>
+      <tr><td><code>name</code></td><td>String</td><td>Submitter's name</td></tr>
+      <tr><td><code>email</code></td><td>String</td><td>Submitter's email</td></tr>
+      <tr><td><code>subject</code></td><td>String</td><td>Subject line</td></tr>
+      <tr><td><code>message</code></td><td>String</td><td>Message body</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="model-brand-api-key">
+  <h2>BrandApiKey Model</h2>
+  <p>Stores API keys for brand partners. Each key is tied to a specific brand and can be activated or deactivated. When a brand partner makes an API call, the middleware looks up the key and automatically scopes all operations to that brand.</p>
+  <p>File: <code>models/BrandApiKey.js</code></p>
+  <table>
+    <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td><code>key</code></td><td>String (unique)</td><td>64-character hex API key</td></tr>
+      <tr><td><code>brandId</code></td><td>ObjectId &rarr; Brand</td><td>The brand this key authenticates as</td></tr>
+      <tr><td><code>label</code></td><td>String</td><td>Human-readable label (e.g. "Production Key")</td></tr>
+      <tr><td><code>active</code></td><td>Boolean</td><td>Whether this key is currently valid</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="model-notification">
+  <h2>Notification Model</h2>
+  <p>Notifications are created by admins and delivered to designers via in-app messages and/or email. Each notification targets specific Indian states, so admins can send region-specific announcements — like a new showroom opening in Maharashtra, or a sale event in Karnataka.</p>
+  <p>File: <code>models/Notification.js</code></p>
+  <table>
+    <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td><code>category</code></td><td>String (required)</td><td>"Traffic Generator" (links to content) or "Advertorial" (standalone message)</td></tr>
+      <tr><td><code>icon</code></td><td>String</td><td>Emoji or image URL shown alongside the notification</td></tr>
+      <tr><td><code>message</code></td><td>String (required, max 280)</td><td>The notification text (like a tweet — short and punchy)</td></tr>
+      <tr><td><code>link</code></td><td>String</td><td>URL to open when clicked (required for Traffic Generator category)</td></tr>
+      <tr><td><code>targetStates</code></td><td>[String]</td><td>Array of Indian state names to target (at least one required)</td></tr>
+      <tr><td><code>channels</code></td><td>Object</td><td><code>{ inApp: Boolean, email: Boolean }</code> — delivery channels</td></tr>
+      <tr><td><code>status</code></td><td>String</td><td>"draft" &rarr; "sent" (or "deleted" at any point)</td></tr>
+      <tr><td><code>source</code></td><td>String</td><td>"manual" (admin-created) or "automated" (future)</td></tr>
+      <tr><td><code>authorId</code> / <code>authorName</code></td><td>ObjectId / String</td><td>The admin who created this notification</td></tr>
+      <tr><td><code>sentAt</code></td><td>Date</td><td>When the notification was sent to recipients</td></tr>
+      <tr><td><code>deletedAt</code></td><td>Date</td><td>When the notification was retracted/soft-deleted</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="model-receipt">
+  <h2>NotificationReceipt Model</h2>
+  <p>One receipt is created per user per notification when a notification is sent. Receipts track the full lifecycle of a notification for each recipient — was it delivered? Did they read it? Did they click the link? This data powers the analytics dashboard for admins.</p>
+  <p>File: <code>models/NotificationReceipt.js</code></p>
+  <table>
+    <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td><code>notificationId</code></td><td>ObjectId &rarr; Notification</td><td>Which notification this receipt is for</td></tr>
+      <tr><td><code>userId</code></td><td>ObjectId &rarr; User</td><td>Which user received it</td></tr>
+      <tr><td><code>state</code> / <code>city</code></td><td>String</td><td>User's location at the time of sending (for geographic analytics)</td></tr>
+      <tr><td><code>deliveredAt</code></td><td>Date</td><td>When the notification was delivered in-app</td></tr>
+      <tr><td><code>readAt</code></td><td>Date</td><td>When the user opened/read the notification</td></tr>
+      <tr><td><code>clickedAt</code></td><td>Date</td><td>When the user clicked the notification's link</td></tr>
+      <tr><td><code>emailSent</code></td><td>Boolean</td><td>Whether the email version was successfully sent</td></tr>
+      <tr><td><code>emailSentAt</code></td><td>Date</td><td>When the email was sent</td></tr>
+    </tbody>
+  </table>
+  <div class="note">Compound unique index on <code>{ notificationId, userId }</code> ensures one receipt per user per notification.</div>
+</section>
+
+<!-- ==================== ENDPOINTS ==================== -->
+
+<section id="ep-auth">
+  <h2>Authentication Endpoints</h2>
+  <p>These endpoints handle user registration, login, and password management. No JWT token is required — these are the entry points to the system.</p>
+  <p>Base path: <code>/auth</code></p>
+
+  <div class="ep"><div class="ep-header"><span class="badge badge-post">POST</span><span class="path">/auth/signup</span><span class="desc">Register new user (creates TempUser + OTP)</span></div></div>
+  <div class="ep"><div class="ep-header"><span class="badge badge-post">POST</span><span class="path">/auth/verify</span><span class="desc">Verify OTP and create permanent user</span></div></div>
+  <div class="ep"><div class="ep-header"><span class="badge badge-post">POST</span><span class="path">/auth/login</span><span class="desc">Login with email + password, returns JWT</span></div></div>
+  <div class="ep"><div class="ep-header"><span class="badge badge-post">POST</span><span class="path">/auth/reset-password</span><span class="desc">Request password reset OTP</span></div></div>
+  <div class="ep"><div class="ep-header"><span class="badge badge-post">POST</span><span class="path">/auth/verify-reset-password</span><span class="desc">Verify password reset OTP</span></div></div>
+  <div class="ep"><div class="ep-header"><span class="badge badge-post">POST</span><span class="path">/auth/set-new-password</span><span class="desc">Set new password after OTP verification</span></div></div>
+
+  <h3>How signup works (step by step)</h3>
+  <div class="card">
+    <div class="journey-step">
+      <div class="journey-num">1</div>
+      <div class="journey-content">
+        <strong>POST /auth/signup</strong>
+        <p>User submits their registration details. A TempUser record is created, a 6-digit OTP is generated, and an email is sent with the code.</p>
+      </div>
+    </div>
+    <div class="journey-step">
+      <div class="journey-num">2</div>
+      <div class="journey-content">
+        <strong>POST /auth/verify</strong>
+        <p>User submits their email + OTP. If valid, the TempUser is promoted to a permanent User, a Company workspace is automatically created, and a JWT token is returned.</p>
+      </div>
+    </div>
+    <div class="journey-step">
+      <div class="journey-num">3</div>
+      <div class="journey-content">
+        <strong>User is now authenticated</strong>
+        <p>The JWT token is included in the <code>Authorization</code> header for all subsequent requests.</p>
+      </div>
+    </div>
+  </div>
+
+  <h4>Signup — Request</h4>
+  <pre>{
+  "first_name": "Priya",
+  "last_name": "Sharma",
+  "email": "priya@designfirm.in",
+  "type": "Individual",
+  "businessName": "Priya Sharma Interiors",
+  "phoneNumber": "9876543210",
+  "password": "securepassword123"
+}</pre>
+
+  <h4>Login — Request &amp; Response</h4>
+  <pre>// Request
+POST /auth/login
+{
+  "email": "priya@designfirm.in",
+  "password": "securepassword123"
+}
+
+// Response
+{
+  "token": "eyJhbGciOiJIUzI1NiIs...",
+  "user": {
+    "_id": "648a1b2c3d4e5f6789012345",
+    "first_name": "Priya",
+    "last_name": "Sharma",
+    "email": "priya@designfirm.in",
+    "type": "Individual",
+    "is_approved": true,
+    "company": "648a1b2c3d4e5f6789012346",
+    "role": "admin"
+  }
+}</pre>
+  <div class="note"><strong>Token duration:</strong> Approved users get long-lived tokens. Unapproved users get tokens that expire in 5 minutes — just enough to complete their profile setup.</div>
+</section>
+
+<section id="ep-profile">
+  <h2>Customer Profile</h2>
+  <p>Endpoints for designers to manage their own account — update personal info, change password, upload professional documents (architecture registration, design degrees), and delete their account.</p>
+  <p>Base path: <code>/customer</code> — All endpoints require <span class="badge badge-auth">JWT</span></p>
+  <div class="ep"><div class="ep-header"><span class="badge badge-get">GET</span><span class="path">/customer/profile</span><span class="desc">Get current user profile</span></div></div>
+  <div class="ep"><div class="ep-header"><span class="badge badge-put">PUT</span><span class="path">/customer/profile</span><span class="desc">Update profile fields</span></div></div>
+  <div class="ep"><div class="ep-header"><span class="badge badge-put">PUT</span><span class="path">/customer/password</span><span class="desc">Change password</span></div></div>
+  <div class="ep"><div class="ep-header"><span class="badge badge-delete">DELETE</span><span class="path">/customer/profile</span><span class="desc">Delete account</span></div></div>
+  <h4>Document Uploads</h4>
+  <p>Designers can upload professional certifications. Files are stored on DigitalOcean Spaces and the URL is saved to their user profile.</p>
+  <div class="ep"><div class="ep-header"><span class="badge badge-post">POST</span><span class="path">/customer/upload/architecture-registration</span><span class="desc">Upload architecture registration</span></div></div>
+  <div class="ep"><div class="ep-header"><span class="badge badge-post">POST</span><span class="path">/customer/upload/interior-design-degree</span><span class="desc">Upload interior design degree</span></div></div>
+  <div class="ep"><div class="ep-header"><span class="badge badge-post">POST</span><span class="path">/customer/upload/architecture-degree</span><span class="desc">Upload architecture degree</span></div></div>
+  <div class="ep"><div class="ep-header"><span class="badge badge-post">POST</span><span class="path">/customer/upload/photo</span><span class="desc">Upload profile photo</span></div></div>
+</section>
+
+<section id="ep-wishlist">
+  <h2>Wishlist</h2>
+  <p>A simple favorites list. Designers can save products they like for later — the wishlist is stored directly on the User document as an array of product IDs.</p>
+  <p>Base path: <code>/customer/wishlist</code> — Requires <span class="badge badge-auth">JWT</span></p>
+  <div class="ep"><div class="ep-header"><span class="badge badge-get">GET</span><span class="path">/customer/wishlist</span><span class="desc">Get user's wishlist (returns full product details)</span></div></div>
+  <div class="ep"><div class="ep-header"><span class="badge badge-post">POST</span><span class="path">/customer/wishlist/add/:productId</span><span class="desc">Add product to wishlist</span></div></div>
+  <div class="ep"><div class="ep-header"><span class="badge badge-post">POST</span><span class="path">/customer/wishlist/remove/:productId</span><span class="desc">Remove product from wishlist</span></div></div>
+</section>
+
+<section id="ep-projects">
+  <h2>Projects</h2>
+  <p>Projects are the main workspace for designers. Each project represents a real-world site and contains spaces, products, and exports. Projects belong to a user and can be shared within a company.</p>
+  <p>Base path: <code>/customer/projects</code> — Requires <span class="badge badge-auth">JWT</span></p>
+  <div class="ep"><div class="ep-header"><span class="badge badge-post">POST</span><span class="path">/customer/projects</span><span class="desc">Create a new project</span></div></div>
+  <div class="ep"><div class="ep-header"><span class="badge badge-get">GET</span><span class="path">/customer/projects</span><span class="desc">List user's projects</span></div></div>
+  <div class="ep"><div class="ep-header"><span class="badge badge-get">GET</span><span class="path">/customer/projects/user/:userId</span><span class="desc">List projects by user ID</span></div></div>
+  <div class="ep"><div class="ep-header"><span class="badge badge-get">GET</span><span class="path">/customer/projects/:id</span><span class="desc">Get single project (with spaces + exports)</span></div></div>
+  <div class="ep"><div class="ep-header"><span class="badge badge-put">PUT</span><span class="path">/customer/projects/:id</span><span class="desc">Update project details</span></div></div>
+  <div class="ep"><div class="ep-header"><span class="badge badge-delete">DELETE</span><span class="path">/customer/projects/:id</span><span class="desc">Archive project (status &rarr; "archived")</span></div></div>
+  <div class="ep"><div class="ep-header"><span class="badge badge-put">PUT</span><span class="path">/customer/projects/:id/soft-delete</span><span class="desc">Soft-delete project (status &rarr; "deleted", hidden everywhere)</span></div></div>
+
+  <h4>Create Project — Request</h4>
+  <pre>{
+  "name": "Sharma Residence",
+  "createdBy": "648a1b2c3d4e5f6789012345",
+  "basic_details": {
+    "city": "Mumbai",
+    "address_line_1": "12, Bandra West",
+    "area": "2400",
+    "unit": "sqft"
+  },
+  "client_details": {
+    "name": "Rajesh Sharma",
+    "mobile_number": "9876543210",
+    "email_id": "rajesh@email.com"
+  }
+}</pre>
+</section>
+
+<section id="ep-spaces">
+  <h2>Spaces</h2>
+  <p>Spaces represent physical areas within a project — like rooms, zones, or floors. Designers organize their product selections by space so they can easily see what goes where.</p>
+  <p>Base path: <code>/customer/projects/:projectId/spaces</code> — Requires <span class="badge badge-auth">JWT</span></p>
+  <div class="ep"><div class="ep-header"><span class="badge badge-post">POST</span><span class="path">/customer/projects/:projectId/spaces</span><span class="desc">Add a space to project</span></div></div>
+  <div class="ep"><div class="ep-header"><span class="badge badge-put">PUT</span><span class="path">/customer/projects/:projectId/spaces/:spaceId</span><span class="desc">Update space name</span></div></div>
+  <div class="ep"><div class="ep-header"><span class="badge badge-delete">DELETE</span><span class="path">/customer/projects/:projectId/spaces/:spaceId</span><span class="desc">Delete space (and its products)</span></div></div>
+
+  <h4>Add Space — Request</h4>
+  <pre>{
+  "name": "Master Bedroom"
+}</pre>
+</section>
+
+<section id="ep-space-products">
+  <h2>Space Products</h2>
+  <p>Products inside a space. When a designer finds a tile they want for the bathroom, they add it to the "Bathroom" space with a quantity. These are embedded subdocuments — they reference the catalog product by ID and store space-specific details like quantity.</p>
+  <p>Base path: <code>/customer/projects/:projectId/spaces/:spaceId/products</code> — Requires <span class="badge badge-auth">JWT</span></p>
+  <div class="ep"><div class="ep-header"><span class="badge badge-post">POST</span><span class="path">/.../products</span><span class="desc">Add product to space</span></div></div>
+  <div class="ep"><div class="ep-header"><span class="badge badge-put">PUT</span><span class="path">/.../products/:productId</span><span class="desc">Update product in space (quantity, notes)</span></div></div>
+  <div class="ep"><div class="ep-header"><span class="badge badge-delete">DELETE</span><span class="path">/.../products/:productId</span><span class="desc">Remove product from space</span></div></div>
+</section>
+
+<section id="ep-project-bank">
+  <h2>Project Bank</h2>
+  <p>A holding area for products the designer is considering for a project but hasn't assigned to a specific space yet. Think of it as a "project-level wishlist" — products can be moved from the bank into a space when the designer decides where they go.</p>
+  <p>Requires <span class="badge badge-auth">JWT</span></p>
+  <div class="ep"><div class="ep-header"><span class="badge badge-post">POST</span><span class="path">/customer/projects/:projectId/project-bank/:productId</span><span class="desc">Add product to bank</span></div></div>
+  <div class="ep"><div class="ep-header"><span class="badge badge-delete">DELETE</span><span class="path">/customer/projects/:projectId/project-bank/:productId</span><span class="desc">Remove from bank</span></div></div>
+</section>
+
+<section id="ep-exports">
+  <h2>Exports CRUD</h2>
+  <p>Exports are saved configurations that define which products to include in generated documents. Each export stores the section name, product references, and URLs for the generated files (PDF Order Sheet, PDF Selection Sheet, Excel).</p>
+  <p>Requires <span class="badge badge-auth">JWT</span></p>
+  <div class="ep"><div class="ep-header"><span class="badge badge-post">POST</span><span class="path">/customer/projects/:projectId/exports</span><span class="desc">Create export</span></div></div>
+  <div class="ep"><div class="ep-header"><span class="badge badge-get">GET</span><span class="path">/customer/projects/:projectId/exports</span><span class="desc">List exports</span></div></div>
+  <div class="ep"><div class="ep-header"><span class="badge badge-get">GET</span><span class="path">/customer/projects/:projectId/exports/:exportId</span><span class="desc">Get single export</span></div></div>
+  <div class="ep"><div class="ep-header"><span class="badge badge-put">PUT</span><span class="path">/customer/projects/:projectId/exports/:exportId</span><span class="desc">Update export</span></div></div>
+  <div class="ep"><div class="ep-header"><span class="badge badge-delete">DELETE</span><span class="path">/customer/projects/:projectId/exports/:exportId</span><span class="desc">Delete export</span></div></div>
+</section>
+
+<section id="ep-export-templates">
+  <h2>Export Templates (HTML / PDF / Excel)</h2>
+  <p>These endpoints generate the actual documents — the professional-looking sheets that designers share with clients and vendors. No authentication is required because export URLs are meant to be shareable.</p>
+  <div class="ep"><div class="ep-header"><span class="badge badge-get">GET</span><span class="path">/.../exports/:exportId/order-sheet</span><span class="desc">Order Sheet HTML (for browser viewing)</span></div></div>
+  <div class="ep"><div class="ep-header"><span class="badge badge-get">GET</span><span class="path">/.../exports/:exportId/order-sheet/pdf</span><span class="desc">Order Sheet PDF download</span></div></div>
+  <div class="ep"><div class="ep-header"><span class="badge badge-get">GET</span><span class="path">/.../exports/:exportId/selection-sheet</span><span class="desc">Selection Sheet HTML (for browser viewing)</span></div></div>
+  <div class="ep"><div class="ep-header"><span class="badge badge-get">GET</span><span class="path">/.../exports/:exportId/selection-sheet/pdf</span><span class="desc">Selection Sheet PDF download</span></div></div>
+  <div class="ep"><div class="ep-header"><span class="badge badge-get">GET</span><span class="path">/.../exports/:exportId/excel</span><span class="desc">Excel spreadsheet download</span></div></div>
+  <div class="note"><strong>Theme colors:</strong> Append <code>?color=HEX</code> (without #) to customize the export appearance. Example: <code>?color=592ebd</code> for purple, <code>?color=1abc9c</code> for teal. Default is beige (#e7e3db).</div>
+  <div class="note"><strong>PDF generation:</strong> Uses Puppeteer to render the HTML template and convert it to PDF. If Chrome isn't available on the server, the request is automatically proxied to a deployment that has it (see <a href="#pdf-proxy">PDF Proxy</a>).</div>
+</section>
+
+<section id="ep-customer-notifs">
+  <h2>Designer Notifications</h2>
+  <p>The designer-facing side of the notification system. These endpoints let the frontend show notifications to users, track whether they've been read, and count unread notifications for badge display.</p>
+  <p>Base path: <code>/customer/notifications</code></p>
+  <div class="ep"><div class="ep-header"><span class="badge badge-get">GET</span><span class="path">/customer/notifications?userId=X</span><span class="desc">List notifications for this user (newest first)</span></div></div>
+  <div class="ep"><div class="ep-header"><span class="badge badge-get">GET</span><span class="path">/customer/notifications/unread-count?userId=X</span><span class="desc">Count of unread notifications (for badge)</span></div></div>
+  <div class="ep"><div class="ep-header"><span class="badge badge-put">PUT</span><span class="path">/customer/notifications/:notificationId/read?userId=X</span><span class="desc">Mark notification as read</span></div></div>
+  <div class="ep"><div class="ep-header"><span class="badge badge-put">PUT</span><span class="path">/customer/notifications/:notificationId/click?userId=X</span><span class="desc">Track link click</span></div></div>
+
+  <h4>List Response Example</h4>
+  <pre>{
+  "notifications": [
+    {
+      "_id": "649b...",
+      "category": "Traffic Generator",
+      "icon": "🔥",
+      "message": "Explore our new Italian marble collection",
+      "link": "https://materialogue.in/marble",
+      "status": "sent",
+      "sentAt": "2025-03-01T10:00:00.000Z",
+      "read": false,
+      "readAt": null,
+      "clicked": false,
+      "clickedAt": null
+    },
+    {
+      "_id": "649a...",
+      "category": "Advertorial",
+      "icon": "📢",
+      "message": "Materialogue now has 50,000+ products!",
+      "link": null,
+      "status": "sent",
+      "sentAt": "2025-02-28T14:30:00.000Z",
+      "read": true,
+      "readAt": "2025-02-28T15:00:00.000Z",
+      "clicked": false,
+      "clickedAt": null
+    }
+  ]
+}</pre>
+</section>
+
+<section id="ep-products">
+  <h2>Product Endpoints</h2>
+  <p>The product catalog is the heart of the platform. These endpoints handle browsing, searching, and filtering the full product database. The search endpoint with cross-filtering is the most heavily used — it powers the main catalog browsing experience.</p>
+  <p>Base path: <code>/products</code></p>
+  <div class="ep"><div class="ep-header"><span class="badge badge-get">GET</span><span class="path">/products</span><span class="desc">Get all non-archived products</span></div></div>
+  <div class="ep"><div class="ep-header"><span class="badge badge-post">POST</span><span class="path">/products</span><span class="desc">Create a product</span></div></div>
+  <div class="ep"><div class="ep-header"><span class="badge badge-post">POST</span><span class="path">/products/withFilters</span><span class="desc">Search and filter products (with cross-filtering)</span></div></div>
+  <div class="ep"><div class="ep-header"><span class="badge badge-post">POST</span><span class="path">/products/bulk</span><span class="desc">Bulk upload products (JSON array)</span></div></div>
+  <div class="ep"><div class="ep-header"><span class="badge badge-get">GET</span><span class="path">/products/bulkCSV</span><span class="desc">Bulk upload products from CSV URL</span></div></div>
+  <div class="ep"><div class="ep-header"><span class="badge badge-get">GET</span><span class="path">/products/:id</span><span class="desc">Get product by ID (includes variants + similar products)</span></div></div>
+
+  <h4>POST /products/withFilters — Request</h4>
+  <pre>{
+  "category": "Sanitary",
+  "primary_sub_category": "Basin Area",
+  "secondary_sub_category": "Wall Mounted Basin",
+  "search": "kohler white",
+  "brand": "Kohler",
+  "color": ["White", "Chrome"],
+  "min_price": 1000,
+  "max_price": 50000,
+  "page": 1,
+  "limit": 20
+}</pre>
+
+  <h4>Response Structure</h4>
+  <pre>{
+  "products": [
+    {
+      "product_name": "Kohler Veil Wall-Hung Basin",
+      "brand": "Kohler",
+      "category": "Sanitary",
+      "primary_sub_category": "Basin Area",
+      "color": "White",
+      "price1": 24500,
+      "unit1": "/piece",
+      "images": ["https://materialogue.blr1.digitaloceanspaces.com/..."],
+      "primary_sku": "KOH-VEIL-WH",
+      "total_variants": 3,
+      "_id": "648b..."
+    }
+  ],
+  "total": 47,
+  "page": 1,
+  "limit": 20,
+  "filters": {
+    "brand": ["Kohler"],
+    "color": ["White", "Chrome", "Biscuit"],
+    "finish": ["Gloss", "Matte"],
+    "size": ["450x350mm", "600x450mm"]
+  },
+  "min_price": 8500,
+  "max_price": 125000
+}</pre>
+  <p>The <code>filters</code> object shows only values that exist in the current filtered set. If selecting "Kohler" as brand means no "Blue" products exist, "Blue" won't appear in the color filter. See <a href="#cross-filtering">Cross-Filtering</a> for details.</p>
+</section>
+
+<section id="ep-custom-products">
+  <h2>Custom Products</h2>
+  <p>For products not in the Materialogue catalog. Designers can create their own product entries with images, specs, and vendor details. Custom products work just like catalog products in projects and exports.</p>
+  <p>Base path: <code>/customProducts</code> — Most require <span class="badge badge-auth">JWT</span></p>
+  <div class="ep"><div class="ep-header"><span class="badge badge-post">POST</span><span class="path">/customProducts</span><span class="desc">Create custom product</span></div></div>
+  <div class="ep"><div class="ep-header"><span class="badge badge-get">GET</span><span class="path">/customProducts</span><span class="desc">List user's custom products</span></div></div>
+  <div class="ep"><div class="ep-header"><span class="badge badge-get">GET</span><span class="path">/customProducts/:id</span><span class="desc">Get single custom product</span></div></div>
+  <div class="ep"><div class="ep-header"><span class="badge badge-put">PUT</span><span class="path">/customProducts/:id</span><span class="desc">Edit custom product</span></div></div>
+  <div class="ep"><div class="ep-header"><span class="badge badge-delete">DELETE</span><span class="path">/customProducts/:id</span><span class="desc">Delete custom product</span></div></div>
+  <div class="ep"><div class="ep-header"><span class="badge badge-post">POST</span><span class="path">/customProducts/upload</span><span class="desc">Upload file for custom product</span></div></div>
+</section>
+
+<section id="ep-categories">
+  <h2>Categories</h2>
+  <p>Returns the full category tree — all categories, subcategories, and sub-subcategories with their <code>hasProducts</code> flags. Used by the frontend to build the category navigation.</p>
+  <div class="ep"><div class="ep-header"><span class="badge badge-get">GET</span><span class="path">/category</span><span class="desc">Get full category tree (3 levels deep)</span></div></div>
+</section>
+
+<section id="ep-admin-users">
+  <h2>Admin — Users</h2>
+  <p>Admin endpoints for managing user accounts. Admins can view all users, update their details, approve/reject signups, and permanently delete accounts.</p>
+  <p>Base path: <code>/admin</code></p>
+  <div class="ep"><div class="ep-header"><span class="badge badge-get">GET</span><span class="path">/admin/users</span><span class="desc">List all users (passwords excluded)</span></div></div>
+  <div class="ep"><div class="ep-header"><span class="badge badge-put">PUT</span><span class="path">/admin/users/:id</span><span class="desc">Update any user field</span></div></div>
+  <div class="ep"><div class="ep-header"><span class="badge badge-delete">DELETE</span><span class="path">/admin/users/:id</span><span class="desc">Permanently delete user</span></div></div>
+  <div class="ep"><div class="ep-header"><span class="badge badge-patch">PATCH</span><span class="path">/admin/users/:id/approve</span><span class="desc">Toggle user approval status</span></div></div>
+</section>
+
+<section id="ep-admin-products">
+  <h2>Admin — Products</h2>
+  <p>Admin endpoints for managing the product catalog. Products can be created individually, bulk uploaded via JSON or CSV, and archived (soft-deleted) when discontinued.</p>
+  <div class="ep"><div class="ep-header"><span class="badge badge-post">POST</span><span class="path">/admin/products</span><span class="desc">Create product (auto-populates brandId from brand name)</span></div></div>
+  <div class="ep"><div class="ep-header"><span class="badge badge-get">GET</span><span class="path">/admin/products</span><span class="desc">List products (paginated, searchable)</span></div></div>
+  <div class="ep"><div class="ep-header"><span class="badge badge-put">PUT</span><span class="path">/admin/products/:id</span><span class="desc">Update product</span></div></div>
+  <div class="ep"><div class="ep-header"><span class="badge badge-delete">DELETE</span><span class="path">/admin/products/:id</span><span class="desc">Archive product (sets is_archived: true)</span></div></div>
+  <div class="ep"><div class="ep-header"><span class="badge badge-post">POST</span><span class="path">/admin/products/bulk</span><span class="desc">Bulk upload (JSON array of products)</span></div></div>
+  <div class="ep"><div class="ep-header"><span class="badge badge-get">GET</span><span class="path">/admin/products/bulkCSV</span><span class="desc">Bulk upload from CSV URL</span></div></div>
+</section>
+
+<section id="ep-admin-brands">
+  <h2>Admin — Brands</h2>
+  <p>Manage brand profiles and their API keys. The "seed" endpoint is particularly useful — it scans all products and auto-creates Brand records for any brand name that doesn't have one yet.</p>
+  <div class="ep"><div class="ep-header"><span class="badge badge-post">POST</span><span class="path">/admin/brands/seed</span><span class="desc">Auto-create brands from product data</span></div></div>
+  <div class="ep"><div class="ep-header"><span class="badge badge-get">GET</span><span class="path">/admin/brands</span><span class="desc">List all brands</span></div></div>
+  <div class="ep"><div class="ep-header"><span class="badge badge-post">POST</span><span class="path">/admin/brands</span><span class="desc">Create brand manually</span></div></div>
+  <div class="ep"><div class="ep-header"><span class="badge badge-put">PUT</span><span class="path">/admin/brands/:id</span><span class="desc">Update brand</span></div></div>
+  <div class="ep"><div class="ep-header"><span class="badge badge-delete">DELETE</span><span class="path">/admin/brands/:id</span><span class="desc">Delete brand</span></div></div>
+  <div class="ep"><div class="ep-header"><span class="badge badge-get">GET</span><span class="path">/admin/brands/:id/api-key</span><span class="desc">Get brand's API key (revealed here only)</span></div></div>
+  <div class="ep"><div class="ep-header"><span class="badge badge-post">POST</span><span class="path">/admin/brands/:id/regenerate-key</span><span class="desc">Regenerate brand API key</span></div></div>
+</section>
+
+<section id="ep-admin-uploads">
+  <h2>Admin — Uploads &amp; Images</h2>
+  <p>File upload and bulk image processing utilities. Files are stored on DigitalOcean Spaces (S3-compatible) and the returned URL is used in product records.</p>
+  <div class="ep"><div class="ep-header"><span class="badge badge-post">POST</span><span class="path">/admin/upload</span><span class="desc">Upload file (Base64 &rarr; DigitalOcean Spaces, returns URL)</span></div></div>
+  <div class="ep"><div class="ep-header"><span class="badge badge-get">GET</span><span class="path">/admin/images/upload-and-download</span><span class="desc">Bulk image processing</span></div></div>
+  <div class="ep"><div class="ep-header"><span class="badge badge-get">GET</span><span class="path">/admin/images/folder-excel</span><span class="desc">Export image folder listing to Excel</span></div></div>
+  <div class="ep"><div class="ep-header"><span class="badge badge-get">GET</span><span class="path">/admin/images/folder-csv</span><span class="desc">Export image folder listing to CSV</span></div></div>
+</section>
+
+<section id="ep-admin-notifs">
+  <h2>Admin — Notifications</h2>
+  <p>The admin side of the notification system. Admins create notifications as drafts, preview the audience, send them out, and track engagement through real-time analytics. Notifications can target specific Indian states and be delivered via in-app messages and/or email.</p>
+  <p>Base path: <code>/admin/notifications</code></p>
+  <div class="ep"><div class="ep-header"><span class="badge badge-post">POST</span><span class="path">/admin/notifications</span><span class="desc">Create draft notification</span></div></div>
+  <div class="ep"><div class="ep-header"><span class="badge badge-get">GET</span><span class="path">/admin/notifications</span><span class="desc">List notifications (filter: status, category, state, search)</span></div></div>
+  <div class="ep"><div class="ep-header"><span class="badge badge-get">GET</span><span class="path">/admin/notifications/states</span><span class="desc">Get available target states (from user addresses)</span></div></div>
+  <div class="ep"><div class="ep-header"><span class="badge badge-get">GET</span><span class="path">/admin/notifications/:id</span><span class="desc">Get notification with live analytics</span></div></div>
+  <div class="ep"><div class="ep-header"><span class="badge badge-get">GET</span><span class="path">/admin/notifications/:id/preview</span><span class="desc">Preview audience (recipient count by state/city)</span></div></div>
+  <div class="ep"><div class="ep-header"><span class="badge badge-post">POST</span><span class="path">/admin/notifications/:id/send</span><span class="desc">Send notification to all recipients</span></div></div>
+  <div class="ep"><div class="ep-header"><span class="badge badge-put">PUT</span><span class="path">/admin/notifications/:id</span><span class="desc">Update draft notification</span></div></div>
+  <div class="ep"><div class="ep-header"><span class="badge badge-delete">DELETE</span><span class="path">/admin/notifications/:id</span><span class="desc">Delete/retract notification (soft-delete)</span></div></div>
+
+  <h4>Create Draft — Request</h4>
+  <pre>{
+  "category": "Traffic Generator",
+  "icon": "🔥",
+  "message": "Check out our new tile collection from Simpolo!",
+  "link": "https://materialogue.in/tiles/simpolo",
+  "targetStates": ["Maharashtra", "Karnataka", "Gujarat"],
+  "channels": { "inApp": true, "email": true },
+  "title": "New Simpolo Tiles",
+  "adminId": "648a..."
+}</pre>
+
+  <h4>Analytics Response (GET /:id)</h4>
+  <p>When you fetch a sent notification, the response includes live analytics computed from all its receipts:</p>
+  <pre>{
+  "_id": "649b...",
+  "message": "Check out our new tile collection from Simpolo!",
+  "status": "sent",
+  "targetStates": ["Maharashtra", "Karnataka", "Gujarat"],
+  "sentAt": "2025-03-01T10:00:00.000Z",
+  "analytics": {
+    "totalRecipients": 150,
+    "totalRead": 87,
+    "totalClicked": 23,
+    "readRate": 58.0,
+    "clickRate": 15.3,
+    "byState": [
+      { "state": "Maharashtra", "delivered": 80, "read": 50, "clicked": 15 },
+      { "state": "Karnataka", "delivered": 45, "read": 25, "clicked": 5 },
+      { "state": "Gujarat", "delivered": 25, "read": 12, "clicked": 3 }
+    ],
+    "byCity": [
+      { "city": "Mumbai", "state": "Maharashtra", "delivered": 45, "read": 30, "clicked": 10 },
+      { "city": "Pune", "state": "Maharashtra", "delivered": 20, "read": 12, "clicked": 3 },
+      { "city": "Bengaluru", "state": "Karnataka", "delivered": 30, "read": 18, "clicked": 4 }
+    ]
+  }
+}</pre>
+</section>
+
+<section id="ep-company">
+  <h2>Company — Members</h2>
+  <p>Team management for design firms. The company admin can add team members (who get a "Company Member" account with their own login), manage their roles, and reset their passwords. Adding a member automatically sends them a welcome email with their credentials.</p>
+  <p>Base path: <code>/company</code> — Requires <span class="badge badge-auth">JWT</span></p>
+  <div class="ep"><div class="ep-header"><span class="badge badge-post">POST</span><span class="path">/company/members</span><span class="desc">Add member (creates User + sends welcome email)</span></div></div>
+  <div class="ep"><div class="ep-header"><span class="badge badge-get">GET</span><span class="path">/company/members</span><span class="desc">List company members</span></div></div>
+  <div class="ep"><div class="ep-header"><span class="badge badge-put">PUT</span><span class="path">/company/members</span><span class="desc">Update member details</span></div></div>
+  <div class="ep"><div class="ep-header"><span class="badge badge-delete">DELETE</span><span class="path">/company/members/:memberId</span><span class="desc">Remove member from company</span></div></div>
+  <div class="ep"><div class="ep-header"><span class="badge badge-post">POST</span><span class="path">/company/members/reset-password</span><span class="desc">Reset member's password</span></div></div>
+</section>
+
+<section id="ep-brands-public">
+  <h2>Brand Pages (Public)</h2>
+  <p>Public-facing brand endpoints — no authentication needed. These power the brand information pages on the frontend, where users can view a brand's profile, collections, and dealer network, and submit contact/enquiry forms.</p>
+  <p>Base path: <code>/brands</code></p>
+  <div class="ep"><div class="ep-header"><span class="badge badge-get">GET</span><span class="path">/brands/:brand_id</span><span class="desc">Get brand profile page data</span></div></div>
+  <div class="ep"><div class="ep-header"><span class="badge badge-post">POST</span><span class="path">/brands/:brand_id/contact</span><span class="desc">Submit contact/enquiry form</span></div></div>
+
+  <h4>Contact Form — Request</h4>
+  <pre>{
+  "name": "Priya Sharma",
+  "email": "priya@designfirm.in",
+  "subject": "Interested in Italian marble collection",
+  "message": "Hi, I'm working on a luxury residential project in Mumbai and would like to know about your Italian marble range. Can you share the catalog?"
+}</pre>
+</section>
+
+<section id="ep-brand-api">
+  <h2>Brand Partner API</h2>
+  <p>Brand partners like Kohler, Jaquar, and Simpolo can manage their own product data through this API. Every request requires an <code>X-API-Key</code> header, and all operations are automatically scoped to the brand that owns the key — a brand can only see and modify their own data.</p>
+  <p>Base path: <code>/brand-api</code> — Requires <code>X-API-Key</code> header</p>
+  <div class="ep"><div class="ep-header"><span class="badge badge-get">GET</span><span class="path">/brand-api/brand</span><span class="desc">View own brand info</span></div></div>
+  <div class="ep"><div class="ep-header"><span class="badge badge-put">PUT</span><span class="path">/brand-api/brand</span><span class="desc">Update own brand info</span></div></div>
+  <div class="ep"><div class="ep-header"><span class="badge badge-get">GET</span><span class="path">/brand-api/products</span><span class="desc">List own products (paginated, filterable)</span></div></div>
+  <div class="ep"><div class="ep-header"><span class="badge badge-post">POST</span><span class="path">/brand-api/products</span><span class="desc">Add a new product (brand auto-assigned)</span></div></div>
+  <div class="ep"><div class="ep-header"><span class="badge badge-put">PUT</span><span class="path">/brand-api/products/:id</span><span class="desc">Update a product</span></div></div>
+  <div class="ep"><div class="ep-header"><span class="badge badge-put">PUT</span><span class="path">/brand-api/products/:id/discontinue</span><span class="desc">Mark product as discontinued</span></div></div>
+  <div class="warn"><strong>No DELETE operations</strong> are available through the Brand Partner API. Products can only be discontinued, never permanently removed. This protects data integrity for existing projects that reference those products.</div>
+
+  <h4>Authentication Example</h4>
+  <pre>// All brand API requests include the X-API-Key header
+GET /brand-api/products
+Headers:
+  X-API-Key: 6596f8e2711eeb0cbfee...
+
+// The middleware automatically identifies the brand from the key
+// and scopes all queries to that brand's products</pre>
+</section>
+
+<!-- ==================== DEEP DIVES ==================== -->
+
+<section id="cross-filtering">
+  <h2>Cross-Filtering System</h2>
+  <p>The <code>POST /products/withFilters</code> endpoint uses a cross-filtering approach that keeps filter options relevant and useful. Instead of showing every possible value for every filter, it dynamically narrows options based on what's currently selected.</p>
+
+  <h3>The problem it solves</h3>
+  <p>Without cross-filtering, a user might select "Kohler" as a brand and still see "Blue" in the color filter — even though Kohler has no blue products. That leads to empty search results and a frustrating experience.</p>
+
+  <h3>How it works</h3>
+  <div class="card">
+    <div class="journey-step">
+      <div class="journey-num">1</div>
+      <div class="journey-content">
+        <strong>Start with the base set</strong>
+        <p>Filter products by category and subcategory to get the base product set.</p>
+      </div>
+    </div>
+    <div class="journey-step">
+      <div class="journey-num">2</div>
+      <div class="journey-content">
+        <strong>For each filter, exclude itself</strong>
+        <p>When computing available values for the "brand" filter, apply all other active filters (color, price, etc.) but NOT the brand filter itself. This way, the brand dropdown shows all brands that have products matching the other criteria.</p>
+      </div>
+    </div>
+    <div class="journey-step">
+      <div class="journey-num">3</div>
+      <div class="journey-content">
+        <strong>Omit empty filters</strong>
+        <p>If a filter has zero available values after cross-filtering, it's removed from the response entirely.</p>
+      </div>
+    </div>
+    <div class="journey-step">
+      <div class="journey-num">4</div>
+      <div class="journey-content">
+        <strong>Compute price range</strong>
+        <p>The min/max price range is also computed from the filtered set (excluding price constraints), so the price slider always reflects the actual available range.</p>
+      </div>
+    </div>
+  </div>
+
+  <h4>Example</h4>
+  <p>User is browsing "Sanitary > Basin Area" and selects Brand = "Kohler":</p>
+  <pre>// The "color" filter values are computed from all Basin Area products
+// where brand = "Kohler" (but the brand filter itself is NOT applied
+// when computing brand options, so all brands with Basin Area products
+// still appear in the brand dropdown)
+
+filters: {
+  brand: ["Kohler", "Jaquar", "Hindware"],  // All brands with basins
+  color: ["White", "Chrome", "Biscuit"],      // Only Kohler's colors
+  finish: ["Gloss", "Matte"],                 // Only Kohler's finishes
+  // "size" omitted — Kohler basins don't have size data
+}</pre>
+  <div class="note"><strong>Performance:</strong> Product normalization (lowercase, trimmed) is pre-computed once per request. Search results are cached and reused across all filter computations to avoid redundant work.</div>
+</section>
+
+<section id="export-system">
+  <h2>Export System</h2>
+  <p>The export system generates professional-grade documents that designers share with clients for material approval and with vendors for procurement. There are three types of exports, each serving a different purpose.</p>
+
+  <h3>Export Types</h3>
+  <div class="card">
+    <h4>Selection Sheet</h4>
+    <p>Visual product cards designed for client presentations. Products are displayed in a 2x2 grid with large images, brand name, product name, and two category-specific specifications. Grouped by space (Living Room, Kitchen, etc.) with a cover page and index. Best for: <em>"Here's what we're recommending for your home."</em></p>
+  </div>
+  <div class="card">
+    <h4>Order Sheet</h4>
+    <p>Tabular format optimized for vendors and procurement. 6 products per page in a table layout with SKU codes, specs, quantities, pricing, and totals. Includes a cover page and disclaimer. Best for: <em>"Here's what we need to order and how much it costs."</em></p>
+  </div>
+  <div class="card">
+    <h4>Excel Spreadsheet</h4>
+    <p>Full-detail spreadsheet with embedded product images, 11 columns (S.No, Image, Brand, Product Name, SKU Code, Spec 1, Spec 2, Quantity, Price, Unit, Amount). Includes header info and a disclaimer section. Best for: <em>"Here's the complete bill of materials."</em></p>
+  </div>
+
+  <h3>Category-Based Attribute Display</h3>
+  <p>Different product categories show different specifications in Selection Sheet and Order Sheet. The system uses a <code>CATEGORY_ATTRIBUTE_MAP</code> to determine which two attributes are most relevant for each category:</p>
+  <table>
+    <thead><tr><th>Category</th><th>Spec 1</th><th>Spec 2</th></tr></thead>
+    <tbody>
+      <tr><td>Walls &amp; Floor &gt; Tile</td><td>Size</td><td>Finish</td></tr>
+      <tr><td>Walls &amp; Floor &gt; Marble / Natural Stone</td><td>Collection</td><td>Thickness</td></tr>
+      <tr><td>Sanitary &gt; Basin / Toilet / Shower</td><td>Colour</td><td>Finish</td></tr>
+      <tr><td>Sanitary &gt; Wellness / Accessories</td><td>Size or Colour</td><td>Finish</td></tr>
+      <tr><td>Surfaces &gt; Veneer</td><td>Size</td><td>Grain Type</td></tr>
+      <tr><td>Surfaces &gt; Wallpaper</td><td>Pattern</td><td>Roll Size</td></tr>
+      <tr><td>Paint &gt; Indoor / Exterior</td><td>Paint Type</td><td>Collection</td></tr>
+      <tr><td>Fabrics &gt; Curtain / Upholstery / Sheer</td><td>Collection</td><td>Material</td></tr>
+      <tr><td>Lights &gt; Architectural</td><td>Colour</td><td>Temperature</td></tr>
+      <tr><td>Lights &gt; Decorative</td><td>Size</td><td>Material</td></tr>
+      <tr><td><em>All others</em></td><td colspan="2">First 2 non-empty from: Texture, Material, Colour, Finish, Size, Thickness, Wattage, Pattern, Shape, Temperature</td></tr>
+    </tbody>
+  </table>
+  <div class="note">If a mapped attribute is empty for a specific product, the system falls back to the generic logic and picks the next available non-empty attribute.</div>
+</section>
+
+<section id="notification-system">
+  <h2>Notification System Architecture</h2>
+  <p>The notification system lets admins communicate with designers across the platform. It supports targeted delivery (by state), dual channels (in-app + email), and provides detailed engagement analytics.</p>
+
+  <h3>Complete Flow</h3>
+  <div class="card">
+    <div class="journey-step">
+      <div class="journey-num">1</div>
+      <div class="journey-content">
+        <strong>Admin creates a draft</strong>
+        <p>Sets category (Traffic Generator or Advertorial), writes the message (max 280 chars), selects target states, and chooses delivery channels.</p>
+      </div>
+    </div>
+    <div class="journey-connector"></div>
+    <div class="journey-step">
+      <div class="journey-num">2</div>
+      <div class="journey-content">
+        <strong>Admin previews the audience</strong>
+        <p>The preview endpoint queries users by state (checking both registered and shipping addresses) and returns the recipient count with state/city breakdown — before anything is sent.</p>
+      </div>
+    </div>
+    <div class="journey-connector"></div>
+    <div class="journey-step">
+      <div class="journey-num">3</div>
+      <div class="journey-content">
+        <strong>Admin sends the notification</strong>
+        <p>A NotificationReceipt is created for every matching user (with their state/city at send time). If email channel is enabled, emails are fired asynchronously via the EMAIL_WEBHOOK_URL — failures are logged but don't block the response.</p>
+      </div>
+    </div>
+    <div class="journey-connector"></div>
+    <div class="journey-step">
+      <div class="journey-num">4</div>
+      <div class="journey-content">
+        <strong>Designers see notifications</strong>
+        <p>The frontend polls <code>/customer/notifications</code> to show the user's notification list. Deleted notifications are automatically hidden. Each notification includes read/click status.</p>
+      </div>
+    </div>
+    <div class="journey-connector"></div>
+    <div class="journey-step">
+      <div class="journey-num">5</div>
+      <div class="journey-content">
+        <strong>Engagement is tracked</strong>
+        <p>When a user reads a notification or clicks its link, the receipt is updated with timestamps. Admins can view live analytics showing read rates, click rates, and geographic breakdown.</p>
+      </div>
+    </div>
+    <div class="journey-connector"></div>
+    <div class="journey-step">
+      <div class="journey-num">6</div>
+      <div class="journey-content">
+        <strong>Admin can retract</strong>
+        <p>Any notification (draft or sent) can be deleted. Sent notifications are soft-deleted — hidden from designers but analytics data is preserved for the admin.</p>
+      </div>
+    </div>
+  </div>
+
+  <h4>Validation Rules</h4>
+  <ul>
+    <li><strong>Traffic Generator</strong> category requires a link (it's meant to drive traffic somewhere)</li>
+    <li>At least one target state must be selected</li>
+    <li>Message max 280 characters</li>
+    <li>Only draft notifications can be edited or sent</li>
+    <li>Any notification (draft or sent) can be deleted/retracted</li>
+    <li>Default listing excludes deleted notifications — pass <code>?status=deleted</code> to see them</li>
+  </ul>
+</section>
+
+<section id="pdf-proxy">
+  <h2>PDF Proxy Fallback</h2>
+  <p>PDF generation uses Puppeteer (headless Chrome) to render HTML templates and convert them to PDF files. This works great on servers with Chrome installed, but some deployment environments don't have the necessary system libraries.</p>
+  <p>The solution: a transparent proxy fallback that lets the same codebase work everywhere.</p>
+
+  <h3>How it works</h3>
+  <div class="card">
+    <div class="journey-step">
+      <div class="journey-num">1</div>
+      <div class="journey-content">
+        <strong>Try local Chrome</strong>
+        <p>When a PDF is requested, the server first tries to launch Chrome locally using Puppeteer.</p>
+      </div>
+    </div>
+    <div class="journey-connector"></div>
+    <div class="journey-step">
+      <div class="journey-num">2</div>
+      <div class="journey-content">
+        <strong>If that fails, proxy the request</strong>
+        <p>If Chrome can't launch (missing libraries), the request is forwarded to <code>PDF_PROXY_URL</code> (defaults to <code>materialogue-backend.replit.app</code>), which has Chrome available.</p>
+      </div>
+    </div>
+    <div class="journey-connector"></div>
+    <div class="journey-step">
+      <div class="journey-num">3</div>
+      <div class="journey-content">
+        <strong>PDF streams back</strong>
+        <p>The proxy server generates the PDF and streams it back to the original caller. The end user never knows the proxy was involved.</p>
+      </div>
+    </div>
+  </div>
+  <div class="note"><strong>Configuration:</strong> Set the <code>PDF_PROXY_URL</code> environment variable to point to a deployment with Chrome installed. The Replit deployment always has Chrome available.</div>
+</section>
+
+</main>
+</div>
+
+<script>
+function _h(s){let h=0;for(let i=0;i<s.length;i++){h=((h<<5)-h)+s.charCodeAt(i);h|=0;}return h;}
+function attemptLogin() {
+  const input = document.getElementById('loginPassword').value;
+  if (_h(input) === 445234471) {
+    document.getElementById('loginOverlay').style.display = 'none';
+    document.getElementById('mainLayout').style.display = 'flex';
+    sessionStorage.setItem('mat_docs_auth', '1');
+  } else {
+    document.getElementById('loginError').style.display = 'block';
+  }
+}
+document.getElementById('loginPassword').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') attemptLogin();
+});
+if (sessionStorage.getItem('mat_docs_auth') === '1') {
+  document.getElementById('loginOverlay').style.display = 'none';
+  document.getElementById('mainLayout').style.display = 'flex';
+}
+
+document.querySelectorAll('.sidebar nav a').forEach(link => {
+  link.addEventListener('click', () => {
+    document.querySelectorAll('.sidebar nav a').forEach(l => l.classList.remove('active'));
+    link.classList.add('active');
+    document.querySelector('.sidebar').classList.remove('open');
+  });
+});
+window.addEventListener('scroll', () => {
+  const sections = document.querySelectorAll('section');
+  let current = '';
+  sections.forEach(s => {
+    if (window.scrollY >= s.offsetTop - 100) current = s.id;
+  });
+  document.querySelectorAll('.sidebar nav a').forEach(a => {
+    a.classList.toggle('active', a.getAttribute('href') === '#' + current);
+  });
+});
+</script>
+</body>
+</html>
